@@ -1,6 +1,6 @@
 import requests
 import json
-
+import re
 
 try:
     import keys as Keys
@@ -16,7 +16,7 @@ while level not in ['A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'N']:
 print("\033[92m" + f"your level is {level}" + "\033[0m")
 target_language = input("\033[93m" + 'what is the language that you are currently learning? \n' + "\033[0m").upper()
 
-storytext ="write me a story that is about" +input('what should the story be about (you are also allowed to leave this empty)\n') 
+storytext ="write me a story that is about" +input('what should the story be about (do not leave this empty)\n') 
 print(" \n ")
 wordlist = ""
 wordlist = input("\033[93m" + "do you have a wordlist of words that you're currently studying? if yes paste it in. \n" + "\033[0m")
@@ -50,19 +50,58 @@ def podcastgenerator(api_key, text):
         return f"Error: {response.status_code} - {response.text}"
     
 def Introwriter(fullStory, targetLanguage, baseLanguage, level, ):
-    promptForIntro =f"""Hi you are an excellent introduction writer for a a Podcast.
-      I want that you write me an introduction for a language learning podcast that is for languagelearners  that are learning{targetLanguage} in the Level of {level}.
-       The Introduction that you're writing should be written only in the {baseLanguage} and you should use no other languages.
-        You should write an introduction that is about the following story: {fullStory}
-        now that you know the full story keep in mind as the last sentence the listener will also hear this story in the language of {targetLanguage}
-        so you should tell the listener something like "And now we're first going to listen to the full story" in {baseLanguage}.
-        keep in mind to keep the introduction short and sweet."""
-    currentStory =podcastgenerator(api_key, promptForIntro)
-    return currentStory
+    promptForIntro = f"""Hi, you are an excellent introduction writer for a Podcast.
+      I want you to write me an introduction for a language learning podcast that is for language learners who are learning {targetLanguage} at the {level} level.
+       The introduction should be written only in {baseLanguage} and should not include any other languages.
+        You should write an introduction that is about the following story: {fullStory}.
+        Now that you know the full story, keep in mind that as the last sentence, the listener will also hear this story in the language of {targetLanguage}.
+        So, you should tell the listener something like "And now we're going to listen to the full story" in {baseLanguage}.
+        Keep the introduction short and sweet."""
+    introduction =podcastgenerator(api_key, promptForIntro)
+    return introduction
 
+def betweenPart(baselanguage):
+    promptForBetween = f"""Hi, you are writing a part of a podcast.
+    your job is it to translate the following sentence in the language of {baselanguage}:
+    "you heard now the full story, wow I hope there were a few words that you understood and some that are completely new to you. let's go over each sentence now and learn them together. " """
+    inbetween_Part =podcastgenerator(api_key, promptForBetween)
+    return inbetween_Part
+
+def explainSentence(fullstory, baseLanguage, targetLanguage, wordlist=None, level=None):
+    sentences = re.split('[.!?]', fullstory)
+    promptForExplanation = ""
+    combineedExplanations = ""
+    print("\033[91m" + str(sentences) + "\033[0m")
+    print("\033[91m" + " \n those should've been the sentences" + "\033[0m")
+    if wordlist:
+        for sentence in sentences:
+            promptForExplanation = f"""Hi, you are an excellent teacher for foreign languages, for a podcast.
+            You will be given a sentence from a story that is written in the language of {targetLanguage}.
+            Your job is to explain the sentence in the language of {baseLanguage}.
+            I want you to explain the sentence in a way that a language learner who is learning {targetLanguage} at the {level} level would understand and also learn something from it.
+            If a word from the wordlist is being used in the sentence, you should explain it extra carefully and put more emphasis on it by using it in other sentences as well.
+            You will be given the following sentence: "{sentences[0]}".
+            If none of the words from the wordlist are used in the sentence, you should explain another word that might be challenging for someone at the {level} level.
+            Here is the wordlist that the listener is currently learning: "{wordlist}"."""
+            combineedExplanations = combineedExplanations + podcastgenerator(api_key, promptForExplanation)["candidates"][0]["content"]["parts"][0]["text"]
+
+    else:
+        for sentence in sentences:
+            promptForExplanation = f"""Hi, you are an excellent teacher for foreign languages, for a podcast.
+            You will be given a sentence from a story that is written in the language of {targetLanguage}.
+            Your job is to explain the sentence in the language of {baseLanguage}.
+            I want you to explain the sentence in a way that a language learner who is learning {targetLanguage} at the {level} level would understand and also learn something from it.
+            You will be given the following sentence: "{sentences[0]}".
+            If none of the words from the wordlist are used in the sentence, you should explain another word that might be challenging for someone at the {level} level."""
+            combineedExplanations = combineedExplanations + podcastgenerator(api_key, promptForExplanation)["candidates"][0]["content"]["parts"][0]["text"]
+    
+    return combineedExplanations
+    
 
 fertigerPodcast = podcastgenerator(api_key, storytext)
 print(fertigerPodcast)
 print("\n \n")
 print(Introwriter(storytext, target_language, baselanguage, level)["candidates"][0]["content"]["parts"][0]["text"])
-print(fertigerPodcast["candidates"][0]["content"]["parts"][0]["text"])
+print("\033[92m" + fertigerPodcast["candidates"][0]["content"]["parts"][0]["text"] + "\033[0m")
+print("\n"+betweenPart(baselanguage)["candidates"][0]["content"]["parts"][0]["text"])
+print("\n"+explainSentence(fertigerPodcast["candidates"][0]["content"]["parts"][0]["text"], baselanguage, target_language, wordlist, level))
