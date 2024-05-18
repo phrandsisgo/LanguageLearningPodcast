@@ -16,16 +16,16 @@ while level not in ['A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'N']:
 print("\033[92m" + f"your level is {level}" + "\033[0m")
 target_language = input("\033[93m" + 'what is the language that you are currently learning? \n' + "\033[0m").upper()
 
-storytext ="write me a story that is about" +input('what should the story be about (do not leave this empty)\n') 
-print(" \n ")
+storyPrompt =f"I want you to write me a story in {target_language} that is about" +input('what should the story be about (do not leave this empty)') 
+print(" \n \n ")
 wordlist = ""
 wordlist = input("\033[93m" + "do you have a wordlist of words that you're currently studying? if yes paste it in. \n" + "\033[0m")
 print(" \n ")
 endtext=""
 if level!='N':
-    endtext =f"{storytext} that is also purely written in the level of {level}."
+    endtext =f"{storyPrompt} that is also purely written in the level of {level} in {target_language}."
 if wordlist !="":
-    storytext = f"{storytext} make sure that all words of the following wordlist are contained in the text {wordlist}"
+    storytext = f"{storyPrompt} make sure that all words of the following wordlist are contained in the text {wordlist} and that it is written purely in {target_language}"
 #add the language
 storytext = f" The story that you are about to write is written only in the language of  {target_language}. {storytext} {endtext}"
 baselanguage = input("\033[93m" + 'what is the language that you want to have it teached? \n' + "\033[0m").upper()
@@ -75,15 +75,22 @@ def explainSentence(fullstory, baseLanguage, targetLanguage, wordlist=None, leve
     print("\033[91m" + " \n those should've been the sentences" + "\033[0m")
     if wordlist:
         for sentence in sentences:
-            promptForExplanation = f"""Hi, you are an excellent teacher for foreign languages, for a podcast.
+            promptForExplanation = f"""
+            Hi, you are an excellent teacher for foreign languages and are an expert to distinguish the languages from each other, for a podcast.
             You will be given a sentence from a story that is written in the language of {targetLanguage}.
             Your job is to explain the sentence in the language of {baseLanguage}.
             I want you to explain the sentence in a way that a language learner who is learning {targetLanguage} at the {level} level would understand and also learn something from it.
             If a word from the wordlist is being used in the sentence, you should explain it extra carefully and put more emphasis on it by using it in other sentences as well.
-            You will be given the following sentence: "{sentences[0]}".
+            You will be given the following sentence: "{sentence}".
             If none of the words from the wordlist are used in the sentence, you should explain another word that might be challenging for someone at the {level} level.
-            Here is the wordlist that the listener is currently learning: "{wordlist}"."""
-            combineedExplanations = combineedExplanations + podcastgenerator(api_key, promptForExplanation)["candidates"][0]["content"]["parts"][0]["text"]
+            Here is the wordlist that the listener is currently learning: "{wordlist}".
+            Please try to only write 3-5 sentences as a explanation. for the sentence that you are given."""
+            currentExplanation = podcastgenerator(api_key, promptForExplanation)["candidates"][0]["content"]["parts"][0]["text"]
+            combineedExplanations = combineedExplanations + currentExplanation
+            print("\033[91m" + currentExplanation + "\033[0m")
+            print("\n\n")
+            print("next phrase (with wordlist)")
+            
 
     else:
         for sentence in sentences:
@@ -91,14 +98,18 @@ def explainSentence(fullstory, baseLanguage, targetLanguage, wordlist=None, leve
             You will be given a sentence from a story that is written in the language of {targetLanguage}.
             Your job is to explain the sentence in the language of {baseLanguage}.
             I want you to explain the sentence in a way that a language learner who is learning {targetLanguage} at the {level} level would understand and also learn something from it.
-            You will be given the following sentence: "{sentences[0]}".
+            You will be given the following sentence: "{sentence}".
             If none of the words from the wordlist are used in the sentence, you should explain another word that might be challenging for someone at the {level} level."""
-            combineedExplanations = combineedExplanations + podcastgenerator(api_key, promptForExplanation)["candidates"][0]["content"]["parts"][0]["text"]
+            currentExplanation = podcastgenerator(api_key, promptForExplanation)["candidates"][0]["content"]["parts"][0]["text"]
+            combineedExplanations = combineedExplanations + currentExplanation
+            print("\033[91m" + currentExplanation + "\033[0m")
+            print("\n\n")
+            print("next phrase")
     
     return combineedExplanations
     
 
-fertigerPodcast = podcastgenerator(api_key, storytext)
+fertigerPodcast = podcastgenerator(api_key, storyPrompt)
 print(fertigerPodcast)
 print("\n \n")
 print(Introwriter(storytext, target_language, baselanguage, level)["candidates"][0]["content"]["parts"][0]["text"])
