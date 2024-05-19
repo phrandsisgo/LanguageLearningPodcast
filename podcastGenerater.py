@@ -48,7 +48,9 @@ def podcastgenerator(api_key, text):
         return response.json()
     else:
         return f"Error: {response.status_code} - {response.text}"
-    
+
+
+
 def Introwriter(fullStory, targetLanguage, baseLanguage, level, ):
     promptForIntro = f"""Hi, you are an excellent introduction writer for a Podcast.
       I want you to write me an introduction for a language learning podcast that is for language learners who are learning {targetLanguage} at the {level} level.
@@ -84,7 +86,9 @@ def explainSentence(fullstory, baseLanguage, targetLanguage, wordlist=None, leve
             You will be given the following sentence: "{sentence}".
             If none of the words from the wordlist are used in the sentence, you should explain another word that might be challenging for someone at the {level} level.
             Here is the wordlist that the listener is currently learning: "{wordlist}".
-            Please try to only write 3-5 sentences as a explanation. for the sentence that you are given."""
+            Please try to only write 3-5 sentences as a explanation. for the sentence that you are given.
+            When you have done that I will need you to differenciate the text by language. (so that in the production will know which language there is to use)
+            """
             currentExplanation = podcastgenerator(api_key, promptForExplanation)["candidates"][0]["content"]["parts"][0]["text"]
             combineedExplanations = combineedExplanations + currentExplanation
             print("\033[91m" + currentExplanation + "\033[0m")

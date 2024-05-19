@@ -1,29 +1,30 @@
 from google.cloud import texttospeech
 import os
 import sys
-
-# Ersetze 'dein_api_schlüssel.json' durch den Pfad zu deinem API-Schlüssel
+documentation = "https://cloud.google.com/text-to-speech/docs/quickstart-client-libraries#client-libraries-install-python"
+# Replace 'your_api_key.json' with the path to your API key
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-client = texttospeech.TextToSpeechClient.from_service_account_json('linguatech-tts.json')
+
+client = texttospeech.TextToSpeechClient.from_service_account_json('your-api-key.json') # would be much nicer if we could use the keys.py file to simply put the api key here
 
 def synthesize_text_RU(text, speed=0.9):
-    # Text, der in Sprache umgewandelt werden soll
-    # text = "Hallo,<break time='1.5s'/> wie geht es dir heute?"
+    # Text to be converted to speech
+    # text = "Hello,<break time='1.5s'/> how are you today?"
 
-    # Konfiguration der Anfrage
+    # Configuration of the request
     synthesis_input = texttospeech.SynthesisInput(ssml=text)
     voice = texttospeech.VoiceSelectionParams(
-        language_code="ru-RU",  # British English
+        language_code="ru-RU",  # Russian
         name="ru-RU-Wavenet-A",
         ssml_gender=texttospeech.SsmlVoiceGender.FEMALE,
     )
     audio_config = texttospeech.AudioConfig(
         audio_encoding=texttospeech.AudioEncoding.MP3,
         speaking_rate=speed,
-        pitch=-5.6
+        pitch=-1.0,
     )
 
-    # Anfrage senden und Antwort erhalten
+    # Send the request and get the response
     response = client.synthesize_speech(
         input=synthesis_input,
         voice=voice,
@@ -43,11 +44,11 @@ def synthesize_text_RU(text, speed=0.9):
     new_file_name = f"{existing_files + 1}Test.mp3"
     output_file = os.path.join(audio_dir, new_file_name)
 
-    # Die Antwort speichern (als MP3-Datei)
+    # Save the response (as an MP3 file)
     with open(output_file, "wb") as out:
         out.write(response.audio_content)
         print("Audioinhalt in 'output_file' geschrieben.")
 
     return output_file
 
-synthesize_text_RU("<speak>это было утомительно.</speak>")
+synthesize_text_RU("<speak>это было утомительно.</speak>", 0.5)
