@@ -193,15 +193,34 @@ def multiTurnExplainer(sentence, baseIso, targetIso, wordList, level):
     You will be given a sentence from a story that is written in the target language that the user is currently learning.
     Your job is to explain the sentence in the explainin language in a way that it sutes the user quite good and he can learn it.
     Do it in a way, so that the user has to guess a word that might be challenging for someone at his level, do it in a way to describe the word without instantly translating it, But don't do it if the sentence is super easy in his level.
-    If a word from the wordlist is being used in the sentence, you should explain it extra carefully and put more emphasis on it by using it in other sentences as well.
-            I want you to explain the sentence in a way that a language learner who is learning the target language  at the {level} level would understand and also learn something from it.
-            If a word from the wordlist is being used in the sentence, you should explain it extra carefully and put more emphasis on it by using it in other sentences as well.
-            You will be given the following sentence: "{sentence}".
-            If none of the words from the wordlist are used in the sentence, you should explain another word that might be challenging for someone at the {level} level.
-            Here is the wordlist that the listener is currently learning: "{wordList}".
-            Please try to only write 3-5 sentences as a explanation. for the sentence that you are given.
-            When you have done that I will need you to differenciate the text by language. (so that in the production will know which language there is to use)
-    the first sentence that you will be given is: "Hallo wie geht es dir?"
+
+   And to give you a step by step guide on how to do it. here's a step by step guide:
+    1. Start with the sentence that you are given. and read it in the language of the target language.
+    2. if the sentence is super easy for the targeted level of the learner, then you can just explain the sentence in the language of the explain language and also add a simple translation.
+    3. If the sentence is a bit more challenging, then you should explain the sentence in the language of the explain language and give also some examples on where the sentence might be used in other circumstances.
+    4. If the sentence contains a word from the wordlist, also give some examples on how the word could be used in other sentences.
+    5. End it with a simple translation of the sentence in the language of the explain language. followed by saying "next sentence" in the explain language. (so it can be used in a Loop for a podcast)
+
+    So for your first sentence, I want you to explain the following sentence: "Je coupe les légumes pour la soupe" from the target language "FR" explained in the "DE" language. for the Level A2 and the wordlist is the following "["Ingrédients (Zutaten)",
+    "Recette (Rezept)",
+    "Cuisiner (kochen)",
+    "Éplucher (schälen)",
+    "Couper (schneiden)",
+    "Mélanger (mischen)",
+    "Faire cuire (kochen, garen)",
+    "Bouillir (sieden, kochen)",
+    "Rôtir (braten, rösten)",
+    "Frire (frittieren)",
+    "Fouetter (schlagen, verquirlen)",
+    "Poêle (Pfanne)",
+    "Casserole (Topf)",
+    "Four (Ofen)",
+    "Griller (grillen)",
+    "Assaisonner (würzen)",
+    "Servir (servieren)",
+    "Pâtisserie (Gebäck)",
+    "Couteau (Messer)",
+    "Planche à découper (Schneidebrett)"]"
     
     """
     data = {
@@ -218,7 +237,12 @@ def multiTurnExplainer(sentence, baseIso, targetIso, wordList, level):
                 "role": "model",
                 "parts": [
                     {
-                        "text": "In the bustling city of Meadow brook, lived a young girl named Sophie. She was a bright and curious soul with an imaginative mind."
+                        "text": """Je coupe les légumes pour la soupe. Bei Ihnen das Wort "coupe" vorkommt konzentrieren wir uns zuerst darauf.
+                         das Wort "coupe" kann auch in Sätzen wie "tu coupes une pomme" also "du schneidest ein Apfel  oder "il coupe le pain" was so viel bedeutet wie "er schneidet das Brot" verwendet werden.
+                         Also in deinem Satz wäre "Ich und dann etwas das Gemüse für die Suppe".  
+                         Wie du es vielleicht schon erraten hast, bedeutet "coupe" schneiden.
+                        Also zusammengefasst bedeutet der Satz "Ich schneide das Gemüse für die Suppe" 
+                         """
                     }
                 ]
             },
@@ -226,7 +250,8 @@ def multiTurnExplainer(sentence, baseIso, targetIso, wordList, level):
                 "role": "user",
                 "parts": [
                     {
-                        "text": "Can you set it in a quiet village in 1600s France?"
+                        "text": f"""As a next sentence I want you to explain the following sentence: "{sentence}" from the target language {targetIso} explained in the {baseIso} language
+                        and this is the wordlist that the user is currently learning: "{wordList}" and the level that the user is learning is {level}"""
                     }
                 ]
             },
