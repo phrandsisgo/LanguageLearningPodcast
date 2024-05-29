@@ -160,28 +160,23 @@ def get_ISO(input):
 
 def differentiator(story, baseLanguage, targetLanguage):
     promptForDifferentiator = f"""
-        You're an excellent teacher who explains sentences in an engaging way.
-        Your explanations should be written in {baseLanguage} only.
-        You will be given a sentence and you will explain it in the {baseLanguage} (baseLanguage).
+        You're an excellent for when it comes to differentiating languages from each other for a podcast.
         Make sure to give the answer with separators (---) when switching languages to separate the languages one from another.
-        Always when using a Separator, you will start the sentence with either a "bl" for baseLanguage (that is the language you're explaining in) or "tl" for targetLanguage (which is the language the sentence is in).
-        You're always explaining the sentence in {baseLanguage}.
-        As soon as you separated the phrase with the --- separator and have a bl then ONLY write in the {baseLanguage}.
-        This is so that later on the base & target Language can be separated from each other.
-        You will exclusively explain the sentence in {baseLanguage}.
-        You will for every sentence focus on a word that could be special in the sentence and explain that as well in the {baseLanguage}.
-        Make sure to write the sentence multiple times in your answer.
-        When you're writing a bl section, make sure to only use the {baseLanguage} and not use the target language.
-        When you're writing a tl section, make sure to only use the targetLanguage that is given by the text and not use the {baseLanguage}.
-        Do not just repeat the sentence in {baseLanguage}, try to come up with a valuable explanation, maybe with an interesting fun fact or something.
-        Keep in mind that after your explanation, the listener will hear the next sentence and the explanation of that sentence.
+        Always when using a Separator, you will start the sentence with the correct ISO-code of the language that you're writing in.
+        Do it as it is shown in the example below.
+        Be sure to always use the correct ISO-code for the language that you're writing in (always use the correct one that is provided by me).
+        Only return the separated text with the correct ISO-code for the language that you're writing in.
+        The text you're writing will be later separated by a regex function that will separate the text by the ISO-code.
 
-        Examples:
-        Sentence: 'Я на улице!' / targetLanguage: Russian
-        Explanation: ---RU Я на улице ---EN the Sentence, ---RU Я на улице ---EN means I'm outside. However, ---RU на улице ---EN can be outside but it also can mean on the street. So the sentence can also mean I'm on the street. So, ---RU на улице ---EN has 2 meanings.
+        Example 1:
+        Sentence: 'the Sentence, "Я на улице!" means I'm outside. However, "на улице" can be outside but it also can mean on the street. So the sentence can also mean I'm on the street. So, "на улице" has 2 meanings.' / targetLanguage: 'RU' / explainLanguage: 'EN'
+        Explanation:  ---EN the Sentence, ---RU Я на улице ---EN means I'm outside. However, ---RU на улице ---EN can be outside but it also can mean on the street. So the sentence can also mean I'm on the street. So, ---RU на улице ---EN has 2 meanings.
         
-        Sentence: 'Was läuft bei dir Junge?' / targetLanguage: German
+        Example 2:
+        Sentence: ' "Was läuft bei dir Junge?" means "what's up with you, boy?" in English if we want to be literal. But you can also translate it as: "what's up dude" it is usually used in informal settings. But literally the word "läuft" means walking and "Junge" means boy. One last time the full sentence: "Was läuft bei dir Junge?"' / targetLanguage: 'DE' / explainLanguage: 'EN'
         Explanation: ---DE Was läuft bei dir Junge? ---EN means 'What's up with you, boy?' in English if we want to be literal. But you can also translate it as: 'what's up dude' it is usually used in informal settings. But literally the word ---DE läuft ---EN means walking and ---DE Junge ---EN means boy. One last time the full sentence: ---DE Was läuft bei dir Junge?
+
+        here's the sentence that you need to differentiate: "{story}" in the language of "{baseLanguage}" and "{targetLanguage}"
     """
 
 def multiTurnExplainer(sentence, baseIso, targetIso, wordList, level):
