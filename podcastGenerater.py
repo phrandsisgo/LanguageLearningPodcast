@@ -116,7 +116,6 @@ def explainSentence(fullstory, baseLanguage, targetLanguage, wordlist=None, leve
 
 
 def get_ISO(input):
-    print(api_key)
     url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + api_key
     headers = {'Content-Type': 'application/json'}
     starting_prompt = """ 
@@ -178,6 +177,8 @@ def differentiator(story, baseLanguage, targetLanguage):
 
         here's the sentence that you need to differentiate: "{story}" in the language of "{baseLanguage}" and "{targetLanguage}"
     """
+    differentiator = podcastgenerator(api_key, promptForDifferentiator)
+    return differentiator["candidates"][0]["content"]["parts"][0]["text"]
 
 def multiTurnExplainer(sentence, baseIso, targetIso, wordList, level):
     url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + api_key
@@ -196,26 +197,15 @@ def multiTurnExplainer(sentence, baseIso, targetIso, wordList, level):
     4. If the sentence contains a word from the wordlist, also give some examples on how the word could be used in other sentences.
     5. End it with a simple translation of the sentence in the language of the explain language. followed by saying "next sentence" in the explain language. (so it can be used in a Loop for a podcast)
 
-    So for your first sentence, I want you to explain the following sentence: "Je coupe les légumes pour la soupe" from the target language "FR" explained in the "DE" language. for the Level A2 and the wordlist is the following "["Ingrédients (Zutaten)",
+    So for your first sentence, I want you to explain the following sentence: "Je coupe les légumes pour la soupe" from the target language "FR" explained in the "DE" language. for the Level A2 and the wordlist is the following "[
+    "Ingrédients (Zutaten)",
     "Recette (Rezept)",
     "Cuisiner (kochen)",
     "Éplucher (schälen)",
     "Couper (schneiden)",
     "Mélanger (mischen)",
-    "Faire cuire (kochen, garen)",
     "Bouillir (sieden, kochen)",
-    "Rôtir (braten, rösten)",
-    "Frire (frittieren)",
-    "Fouetter (schlagen, verquirlen)",
-    "Poêle (Pfanne)",
-    "Casserole (Topf)",
-    "Four (Ofen)",
-    "Griller (grillen)",
-    "Assaisonner (würzen)",
-    "Servir (servieren)",
-    "Pâtisserie (Gebäck)",
-    "Couteau (Messer)",
-    "Planche à découper (Schneidebrett)"]"
+    
     
     """
     data = {
@@ -254,17 +244,25 @@ def multiTurnExplainer(sentence, baseIso, targetIso, wordList, level):
     }
     response = requests.post(url, headers=headers, data=json.dumps(data))
     if response.status_code == 200:
-        return response.json()
+        return response.json()["candidates"][0]["content"]["parts"][0]["text"]
     else:
         return f"Error: {response.status_code} - {response.text}" 
     
 
-fertigerPodcast = podcastgenerator(api_key, storyPrompt)
+finishedStory = podcastgenerator(api_key, storyPrompt)["candidates"][0]["content"]["parts"][0]["text"]
 isoBase = get_ISO(baselanguage)
 isoTarget = get_ISO(target_language)
-print(fertigerPodcast)
+print(finishedStory)
 print("\n \n")
 print(Introwriter(storytext, target_language, baselanguage, level)["candidates"][0]["content"]["parts"][0]["text"])
-print("\033[92m" + fertigerPodcast["candidates"][0]["content"]["parts"][0]["text"] + "\033[0m")
+print("\033[92m" + finishedStory + "\033[0m")
 print("\n"+betweenPart(baselanguage)["candidates"][0]["content"]["parts"][0]["text"])
-print("\n"+explainSentence(fertigerPodcast["candidates"][0]["content"]["parts"][0]["text"], baselanguage, target_language, wordlist, level))
+storySentences = re.split('[.!?]', finishedStory)
+for sentence in storySentences:
+    sentenceExplenation = multiTurnExplainer(sentence, isoBase, isoTarget, wordlist, level)
+    print("\n"+differentiator(sentenceExplenation, isoBase, isoTarget))
+
+print("\n"+explainSentence(finishedStory["candidates"][0]["content"]["parts"][0]["text"], baselanguage, target_language, wordlist, level))
+
+print("\n \n")
+print("\033[92m" + "Now I should write an outro for the podcast" + "\033[0m")

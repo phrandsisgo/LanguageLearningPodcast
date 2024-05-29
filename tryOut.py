@@ -1,7 +1,7 @@
 import requests
 import json
 import re
-
+import podcastGenerater as pg
 try:
     import keys as Keys
     api_key = Keys.gemini_key
@@ -130,5 +130,5 @@ def get_ISO(input):
 
 # Example usage
 #api_key = "YOUR_API_KEY"  # Replace with your actual API ke
-print(multiTurn("japanese"))
+#print(multiTurn("japanese"))
 #chat_with_model(api_key, starting_message)
