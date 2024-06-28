@@ -15,8 +15,8 @@ while level not in ['A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'N']:
     level = input('what is your  the level that you are learning your language? \n').upper()
 print("\033[92m" + f"your level is {level}" + "\033[0m")
 target_language = input("\033[93m" + 'what is the language that you are currently learning? \n' + "\033[0m").upper()
-
-storyPrompt =f"I want you to write me a story in {target_language} that is about" +input('what should the story be about (do not leave this empty)') 
+storyInput = input('\033[92m' + 'what should the story be about (do not leave this empty)' + '\033[0m')
+storyPrompt =f"I want you to write me a story in {target_language} that is about" +storyInput 
 print(" \n \n ")
 wordlist = ""
 wordlist = input("\033[93m" + "do you have a wordlist of words that you're currently studying? if yes paste it in. \n" + "\033[0m")
