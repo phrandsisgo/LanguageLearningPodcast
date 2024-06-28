@@ -158,6 +158,8 @@ def get_ISO(input):
         return f"Error: {response.status_code} - {response.text}" 
 
 def differentiator(story, baseLanguage, targetLanguage):
+    url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + api_key
+    headers = {'Content-Type': 'application/json'}
     promptForDifferentiator = f"""
         You're an excellent for when it comes to differentiating languages from each other for a podcast.
         Make sure to give the answer with separators (---) when switching languages to separate the languages one from another.
@@ -168,24 +170,77 @@ def differentiator(story, baseLanguage, targetLanguage):
         The text you're writing will be later separated by a regex function that will separate the text by the ISO-code.
         make sure that you always pick the correct language even if it is for only a single word.
 
-        Example 1:
-        Sentence: 'the Sentence, "Я на улице!" means I'm outside. However, "на улице" can be outside but it also can mean on the street. So the sentence can also mean I'm on the street. So, "на улице" has 2 meanings.' / targetLanguage: 'RU' / explainLanguage: 'EN'
-        Explanation:  ---EN the Sentence, ---RU Я на улице ---EN means I'm outside. However, ---RU на улице ---EN can be outside but it also can mean on the street. So the sentence can also mean I'm on the street. So, ---RU на улице ---EN has 2 meanings.
-        
-        Example 2:
-        Sentence: ' "Was läuft bei dir Junge?" means "what's up with you, boy?" in English if we want to be literal. But you can also translate it as: "what's up dude" it is usually used in informal settings. But literally the word "läuft" means walking and "Junge" means boy. One last time the full sentence: "Was läuft bei dir Junge?"' / targetLanguage: 'DE' / explainLanguage: 'EN'
-        Explanation: ---DE Was läuft bei dir Junge? ---EN means 'What's up with you, boy?' in English if we want to be literal. But you can also translate it as: 'what's up dude' it is usually used in informal settings. But literally the word ---DE "läuft" ---EN means walking and ---DE Junge ---EN means boy. One last time the full sentence: ---DE Was läuft bei dir Junge?
-
-        Example 3:
-        Sentence: ' "Je suis dans la cuisine" bedeutet "Ich bin in der Küche" auf Deutsch. Das Wort "cuisine" bedeutet "Küche". noch einmal der ganzer Satz zur Wiederholung:  "Je suis dans la cuisine" ' / targetLanguage: 'FR' / explainLanguage: 'DE'
-        Explanation: ---FR Je suis dans la cuisine ---DE bedeutet 'Ich bin in der Küche' auf Deutsch. Das Wort ---FR "cuisine" ---DE bedeutet 'Küche'. noch einmal der ganzer Satz zur Wiederholung: ---FR "Je suis dans la cuisine"
-
-        
+        the first sentence that you need to differentiate is the following: the Sentence, "Я на улице!" means I'm outside. However, "на улице" can be outside but it also can mean on the street. So the sentence can also mean I'm on the street. So, "на улице" has 2 meanings.
+   
 
         here's the sentence that you need to differentiate: "{story}" in the language of "{baseLanguage}" and "{targetLanguage}"
     """
-    differentiator = podcastgenerator(api_key, promptForDifferentiator)
-    return differentiator["candidates"][0]["content"]["parts"][0]["text"]
+    data = {
+        "contents": [
+            {
+                "role": "user",
+                "parts": [
+                    {
+                        "text": promptForDifferentiator #muss noch umgeschrieben werden
+                    }
+                ]
+            },
+            {
+                "role": "model",
+                "parts": [
+                    {
+                        "text": """ ---EN the Sentence, ---RU Я на улице ---EN means I'm outside. However, ---RU на улице ---EN can be outside but it also can mean on the street. So the sentence can also mean I'm on the street. So, ---RU на улице ---EN has 2 meanings."""
+                    }
+                ]
+            },
+            {
+                "role": "user",
+                "parts": [
+                    {
+                        "text": """ "Was läuft bei dir Junge?" means "what's up with you, boy?" in English if we want to be literal. But you can also translate it as: "what's up dude" it is usually used in informal settings. But literally the word "läuft" means walking and "Junge" means boy. One last time the full sentence: "Was läuft bei dir Junge?"' / targetLanguage: 'DE' / explainLanguage: 'EN'"""
+                    }
+                ]
+            },
+            {
+                "role": "model",
+                "parts": [
+                    {
+                        "text": """ ---DE Was läuft bei dir Junge? ---EN means 'What's up with you, boy?' in English if we want to be literal. But you can also translate it as: 'what's up dude' it is usually used in informal settings. But literally the word ---DE "läuft" ---EN means walking and ---DE Junge ---EN means boy. One last time the full sentence: ---DE Was läuft bei dir Junge? """
+                    }
+                ]
+            },
+            {
+                "role": "user",
+                "parts": [
+                    {
+                        "text": """ "Je suis dans la cuisine" bedeutet "Ich bin in der Küche" auf Deutsch. Das Wort "cuisine" bedeutet "Küche". noch einmal der ganzer Satz zur Wiederholung:  "Je suis dans la cuisine" ' / targetLanguage: 'FR' / explainLanguage: 'DE'"""
+                    }
+                ]
+            },
+            {
+                "role": "model",
+                "parts": [
+                    {
+                        "text": """ ---FR Je suis dans la cuisine ---DE bedeutet 'Ich bin in der Küche' auf Deutsch. Das Wort ---FR "cuisine" ---DE bedeutet 'Küche'. noch einmal der ganzer Satz zur Wiederholung: ---FR "Je suis dans la cuisine" """
+                    }
+                ]
+            },
+            {
+                "role": "user",
+                "parts": [
+                    {
+                        "text": f"""{story}" in the language of "{baseLanguage}" and "{targetLanguage}" """
+                    }
+                ]
+            },
+        ]
+    }
+    response = requests.post(url, headers=headers, data=json.dumps(data))
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return f"Error: {response.status_code} - {response.text}"
+    #return differentiator["candidates"][0]["content"]["parts"][0]["text"]
 
 def multiTurnExplainer(sentence, baseIso, targetIso, wordList, level):
     url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + api_key
@@ -271,7 +326,8 @@ storySentences = re.split('[.!?]', finishedStory)
 #story explenation
 for sentence in storySentences:
     sentenceExplenation = multiTurnExplainer(sentence, isoBase, isoTarget, wordlist, level)
-    print("\n"+differentiator(sentenceExplenation, isoBase, isoTarget))
+    print("\n")
+    print(differentiator(sentenceExplenation, isoBase, isoTarget))
 
 print("\n"+explainSentence(finishedStory["candidates"][0]["content"]["parts"][0]["text"], baselanguage, target_language, wordlist, level))
 
