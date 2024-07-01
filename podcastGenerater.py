@@ -1,6 +1,7 @@
 import requests
 import json
 import re
+import openAiPodcastGenerator as openAiPodcastGenerator
 
 try:
     import keys as Keys
@@ -173,7 +174,6 @@ def differentiator(story, baseLanguage, targetLanguage):
         the first sentence that you need to differentiate is the following: the Sentence, "Я на улице!" means I'm outside. However, "на улице" can be outside but it also can mean on the street. So the sentence can also mean I'm on the street. So, "на улице" has 2 meanings.
    
 
-        here's the sentence that you need to differentiate: "{story}" in the language of "{baseLanguage}" and "{targetLanguage}"
     """
     data = {
         "contents": [

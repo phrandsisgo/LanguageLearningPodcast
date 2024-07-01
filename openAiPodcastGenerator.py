@@ -61,4 +61,34 @@ def emptyPromptFunction(prompt):
         ],
     )
     return response
+def lang_differentiator(sentence, baselanguage, targetlanguage):
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo-instruct",
+        messages=[
+            {"role": "system", "content": """
+            You're an excellent for when it comes to differentiating languages from each other for a podcast.
+            Make sure to give the answer with separators (---) when switching languages to separate the languages one from another.
+            Always when using a Separator, you will start the sentence with the correct ISO-code of the language that you're writing in.
+            Do it as it is shown in the example below.
+            Be sure to always use the correct ISO-code for the language that you're writing in (always use the correct one that is provided by me).
+            Only return the separated text with the correct ISO-code for the language that you're writing in.
+            The text you're writing will be later separated by a regex function that will separate the text by the ISO-code.
+            make sure that you always pick the correct language even if it is for only a single word.
+
+
+            """},
+            {"role": "user", "content": f""" the first sentence that you need to differentiate is the following: the Sentence, "Я на улице!" means I'm outside. However, "на улице" can be outside but it also can mean on the street. So the sentence can also mean I'm on the street. So, "на улице" has 2 meanings. /targetLanguage: 'RU' /explainLanguage:'EN' """ },
+
+            {"role": "assistant", "content": f""" ---EN the Sentence, ---RU Я на улице ---EN means I'm outside. However, ---RU на улице ---EN can be outside but it also can mean on the street. So the sentence can also mean I'm on the street. So, ---RU на улице ---EN has 2 meanings. """},
+
+            {"role": "user", "content": f""""Was läuft bei dir Junge?" means "what's up with you, boy?" in English if we want to be literal. But you can also translate it as: "what's up dude" it is usually used in informal settings. But literally the word "läuft" means walking and "Junge" means boy. One last time the full sentence: "Was läuft bei dir Junge?"' / targetLanguage: 'DE' / explainLanguage: 'EN' """}, 
+
+            {"role": "assistant", "content": f""" ---DE "Was läuft bei dir Junge?" ---EN means 'What's up with you, boy?' in English if we want to be literal. But you can also translate it as: 'what's up dude' it is usually used in informal settings. But literally the word ---DE "läuft" ---EN means walking and ---DE Junge ---EN means boy. One last time the full sentence: ---DE Was läuft bei dir Junge? """},
+
+            {"role": "user", "content": f"""Here's the sentence that you need to differentiate: "{sentence}" in the language of "{baselanguage}" and "{targetlanguage}""" },
+
+        ],
+    )
+    return response
+    return response
 print(emptyPromptFunction(storytext))
