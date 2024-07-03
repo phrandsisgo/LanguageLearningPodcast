@@ -327,7 +327,9 @@ storySentences = re.split('[.!?]', finishedStory)
 for sentence in storySentences:
     sentenceExplenation = multiTurnExplainer(sentence, isoBase, isoTarget, wordlist, level)
     print("\n")
-    print(lang_differentiator(sentenceExplenation, isoBase, isoTarget))
+    differentiated = lang_differentiator(sentenceExplenation, isoBase, isoTarget) 
+    print(f"Message: {differentiated}")
+
 
 print("\n"+explainSentence(finishedStory["candidates"][0]["content"]["parts"][0]["text"], baselanguage, target_language, wordlist, level))
 

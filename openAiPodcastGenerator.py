@@ -68,11 +68,16 @@ def emptyPromptFunction(prompt):
             {"role": "user", "content": prompt},
         ],
     )
-    return response
+    message_content = response['choices'][0]['message']['content']
+    total_tokens = response['choices'][0]['total_tokens']
+    return {
+        "message": message_content,
+        "total_tokens": total_tokens
+    }
 
 def lang_differentiator(sentence, baselanguage, targetlanguage):
     response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo-instruct",
+        model="gpt-4o",
         messages=[
             {"role": "system", "content": """
             You're an excellent for when it comes to differentiating languages from each other for a podcast.
@@ -99,4 +104,4 @@ def lang_differentiator(sentence, baselanguage, targetlanguage):
         ],
     )
     return response
-print(emptyPromptFunction("""This is just a test. Answer with "yes I do understand" please"""))
+#print(emptyPromptFunction("""This is just a test. Answer with "yes I do understand" please"""))
