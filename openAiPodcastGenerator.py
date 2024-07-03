@@ -1,16 +1,24 @@
 import requests
 import json
-import re
-from openai import OpenAI
-
+import openai
 try:
     import keys as Keys
-    api_key = Keys.gemini_key
+    api_key = Keys.openai_key
+    organization_id = Keys.openai_organization_id
+    project_id = Keys.openai_project_id
 except ImportError:
     api_key = input("Please enter your OpenAI API key: ")
+    organization_id = input("Please enter your OpenAI organization ID: ")
+    project_id = input("Please enter your OpenAI project ID: ")
 
-client = OpenAI(api_key=api_key)
 
+openai.api_key = api_key
+headers = {
+    "Authorization": f"Bearer {api_key}",
+    "OpenAI-Organization": organization_id,
+    "OpenAI-Project": project_id,
+}
+"""
 level = input("\033[93m" + 'what is your language level? \n' + "\033[0m").upper()
 
 while level not in ['A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'N']:
@@ -34,7 +42,7 @@ if wordlist !="":
 storytext = f" The story that you are about to write is written only in the language of  {target_language}. {storytext} {endtext}"
 baselanguage = input("\033[93m" + 'what is the language that you want to have it teached? \n' + "\033[0m").upper()
 print(" \n \n ")
-
+"""
 def Introwriter(fullStory, targetLanguage, baseLanguage, level, ):
     promptForIntro = f"""Hi, you are an excellent introduction writer for a Podcast.
       I want you to write me an introduction for a language learning podcast that is for language learners who are learning {targetLanguage} at the {level} level.
@@ -43,7 +51,7 @@ def Introwriter(fullStory, targetLanguage, baseLanguage, level, ):
         Now that you know the full story, keep in mind that as the last sentence, the listener will also hear this story in the language of {targetLanguage}.
         So, you should tell the listener something like "And now we're going to listen to the full story" in {baseLanguage}.
         Keep the introduction short and sweet."""
-    response = client.chat.completions.create(
+    response = openai.chat.completions.create(
         model="gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": "You are a conversation designer."},
@@ -53,7 +61,7 @@ def Introwriter(fullStory, targetLanguage, baseLanguage, level, ):
     return response
 
 def emptyPromptFunction(prompt):
-    response = client.chat.completions.create(
+    response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": "You are a helpful assistant."},
@@ -61,8 +69,9 @@ def emptyPromptFunction(prompt):
         ],
     )
     return response
+
 def lang_differentiator(sentence, baselanguage, targetlanguage):
-    response = client.chat.completions.create(
+    response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo-instruct",
         messages=[
             {"role": "system", "content": """
@@ -90,5 +99,4 @@ def lang_differentiator(sentence, baselanguage, targetlanguage):
         ],
     )
     return response
-    return response
-print(emptyPromptFunction(storytext))
+print(emptyPromptFunction("""This is just a test. Answer with "yes I do understand" please"""))

@@ -1,7 +1,7 @@
 import requests
 import json
 import re
-import openAiPodcastGenerator as openAiPodcastGenerator
+from openAiPodcastGenerator import lang_differentiator
 
 try:
     import keys as Keys
@@ -327,7 +327,7 @@ storySentences = re.split('[.!?]', finishedStory)
 for sentence in storySentences:
     sentenceExplenation = multiTurnExplainer(sentence, isoBase, isoTarget, wordlist, level)
     print("\n")
-    print(differentiator(sentenceExplenation, isoBase, isoTarget))
+    print(lang_differentiator(sentenceExplenation, isoBase, isoTarget))
 
 print("\n"+explainSentence(finishedStory["candidates"][0]["content"]["parts"][0]["text"], baselanguage, target_language, wordlist, level))
 

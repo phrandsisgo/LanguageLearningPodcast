@@ -1,3 +1,5 @@
 keys.py
 linguatech-tts.json
 Audio
+__pycache__/
+*.pyc
