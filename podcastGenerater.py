@@ -17,8 +17,9 @@ while level not in ['A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'N']:
 print("\033[92m" + f"your level is {level}" + "\033[0m")
 target_language = input("\033[93m" + 'what is the language that you are currently learning? \n' + "\033[0m").upper()
 storyInput = input('\033[92m' + 'what should the story be about (do not leave this empty)' + '\033[0m')
+print("\n \n ")
 storyPrompt =f"I want you to write me a story in {target_language} that is about" +storyInput 
-print(" \n \n ")
+print(" \n ")
 wordlist = ""
 wordlist = input("\033[93m" + "do you have a wordlist of words that you're currently studying? if yes paste it in. \n" + "\033[0m")
 print(" \n ")
@@ -324,11 +325,24 @@ print("\033[92m" + finishedStory + "\033[0m")
 print("\n"+betweenPart(baselanguage)["candidates"][0]["content"]["parts"][0]["text"])
 storySentences = re.split('[.!?]', finishedStory)
 #story explenation
+def process_openai_object(openai_object):
+    # Wandelt das OpenAIObject in einen JSON-String um
+    json_str = json.dumps(openai_object)
+    return json.loads(json_str)
+
 for sentence in storySentences:
     sentenceExplenation = multiTurnExplainer(sentence, isoBase, isoTarget, wordlist, level)
     print("\n")
-    differentiated = lang_differentiator(sentenceExplenation, isoBase, isoTarget) 
-    print(f"Message: {differentiated}")
+    differentiated = lang_differentiator(sentenceExplenation, isoBase, isoTarget)
+
+    # Verarbeite das OpenAIObject
+    differentiated_json = process_openai_object(differentiated)
+
+    differentiatedContent = differentiated_json["choices"][0]["message"]["content"]
+    differentiatedCount = differentiated_json["usage"]["total_tokens"]
+
+    print(f"Message: {differentiatedContent}")
+    print(f"Token count: {differentiatedCount}")
 
 
 print("\n"+explainSentence(finishedStory["candidates"][0]["content"]["parts"][0]["text"], baselanguage, target_language, wordlist, level))
