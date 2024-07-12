@@ -24,6 +24,7 @@ wordlist = ""
 wordlist = input("\033[93m" + "do you have a wordlist of words that you're currently studying? if yes paste it in. \n" + "\033[0m")
 print(" \n ")
 endtext=""
+open_ai_tokens = 0
 if level!='N':
     endtext =f"{storyPrompt} that is also purely written in the level of {level} in {target_language}."
 if wordlist !="":
@@ -72,6 +73,10 @@ def betweenPart(baselanguage):
     inbetween_Part =podcastgenerator(api_key, promptForBetween)
     return inbetween_Part
 
+def updateTokens(currentTokens, newTokens):
+    currentTokens += newTokens
+    return currentTokens
+
 def explainSentence(fullstory, baseLanguage, targetLanguage, wordlist=None, level=None):
     sentences = re.split('[.!?]', fullstory)
     #sentences = re.findall(r'[^.!?]+[.!?]', fullstory) ## With this the punctuation is included in the sentence.
@@ -116,6 +121,55 @@ def explainSentence(fullstory, baseLanguage, targetLanguage, wordlist=None, leve
     
     return combineedExplanations
 
+
+def explainSentence1(fullstory, baseLanguage, targetLanguage, wordlist=None, level=None):
+    sentences = re.split('[.!?]', fullstory)
+    #sentences = re.findall(r'[^.!?]+[.!?]', fullstory) ## With this the punctuation is included in the sentence.
+    promptForExplanation = ""
+    combineedExplanations = ""
+    print("\033[91m" + str(sentences) + "\033[0m")
+    print("\033[91m" + " \n those should've been the sentences" + "\033[0m")
+    if wordlist:
+        for sentence in sentences:
+            promptForExplanation = f"""
+            As an expert language teacher for a podcast, explain the following sentence from a {targetLanguage} story to a {level} level learner of {targetLanguage}. The explanation should be in {baseLanguage}.
+
+            full story for context: "{fullstory}"
+
+            Current sentence to explain: "{sentence.strip()}"
+
+            Guidelines:
+            1. Start with a smooth transition (e.g., "Let's move on to the next part." or "Now, we encounter an interesting phrase.")
+            2. Explain the sentence, focusing on its meaning and any challenging words or structures.
+            3. If the sentence contains words from this list: {wordlist}, provide extra explanation and examples.
+            4. Include cultural notes or usage tips if relevant.
+            5. Aim for a concise yet informative explanation (maximum should be 7 sentences that you use and don't go over that threshhold).
+            6. End with a brief summary or a question to engage the listener.
+
+            Remember, your explanation should flow naturally as part of a podcast, maintaining listener engagement between sentences.
+            """
+            currentExplanation = podcastgenerator(api_key, promptForExplanation)["candidates"][0]["content"]["parts"][0]["text"]
+            combineedExplanations = combineedExplanations + currentExplanation
+            print("\033[91m" + currentExplanation + "\033[0m")
+            print("\n\n")
+            print("next phrase (with wordlist)")
+            
+
+    else:
+        for sentence in sentences:
+            promptForExplanation = f"""Hi, you are an excellent teacher for foreign languages, for a podcast.
+            You will be given a sentence from a story that is written in the language of {targetLanguage}.
+            Your job is to explain the sentence in the language of {baseLanguage}.
+            I want you to explain the sentence in a way that a language learner who is learning {targetLanguage} at the {level} level would understand and also learn something from it.
+            You will be given the following sentence: "{sentence}".
+            If none of the words from the wordlist are used in the sentence, you should explain another word that might be challenging for someone at the {level} level."""
+            currentExplanation = podcastgenerator(api_key, promptForExplanation)["candidates"][0]["content"]["parts"][0]["text"]
+            combineedExplanations = combineedExplanations + currentExplanation
+            print("\033[91m" + currentExplanation + "\033[0m")
+            print("\n\n")
+            print("next phrase")
+    
+    return combineedExplanations
 
 def get_ISO(input):
     url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + api_key
@@ -311,13 +365,49 @@ def multiTurnExplainer(sentence, baseIso, targetIso, wordList, level):
     else:
         return f"Error: {response.status_code} - {response.text}" 
     
+def singleTurnExplainer(sentence, baseIso, targetIso, wordList, level, fullStory):
+    startPrompt = f"""
+            As an expert language teacher for a podcast, explain the following sentence from a {targetIso} story to a {level} level learner of {targetIso}. The explanation should be in {baseIso}.
 
-finishedStory = podcastgenerator(api_key, storyPrompt)["candidates"][0]["content"]["parts"][0]["text"]
+            for context here's the full story for context: {fullStory}
+
+            Current sentence to explain: "{sentence}"
+
+            Guidelines:
+            1. Start with a smooth transition (e.g., "Let's move on to the next part." or "Now, we encounter an interesting phrase.")
+            2. Explain the sentence, focusing on its meaning and any challenging words or structures.
+            3. If the sentence contains words from this list: {wordlist}, provide extra explanation and examples.
+            4. Include cultural notes or usage tips if relevant.
+            5. Aim for a concise yet informative explanation (maximum 7 sentences please don't go over that threshhold).
+            6. End with a brief summary or a question to engage the listener.
+
+            Remember, your explanation should flow naturally as part of a podcast, maintaining listener engagement between sentences.
+            """
+    url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + api_key
+    headers = {'Content-Type': 'application/json'}
+    
+    data = {
+        "contents": [
+            {
+                "role": "user",
+                "parts": [{"text": startPrompt}]
+            }
+        ]
+    }
+    
+    response = requests.post(url, headers=headers, data=json.dumps(data))
+    if response.status_code == 200:
+        return response.json()["candidates"][0]["content"]["parts"][0]["text"]
+    else:
+        return f"Error: {response.status_code} - {response.text}"
+
+finishedStory = podcastgenerator(api_key, storyPrompt)
 isoBase = get_ISO(baselanguage)
 isoTarget = get_ISO(target_language)
 print(finishedStory)
 print("\n \n")
 #Intro
+finishedStory =finishedStory["candidates"][0]["content"]["parts"][0]["text"]
 print(Introwriter(storytext, target_language, baselanguage, level)["candidates"][0]["content"]["parts"][0]["text"])
 #the story
 print("\033[92m" + finishedStory + "\033[0m")
@@ -331,7 +421,7 @@ def process_openai_object(openai_object):
     return json.loads(json_str)
 
 for sentence in storySentences:
-    sentenceExplenation = multiTurnExplainer(sentence, isoBase, isoTarget, wordlist, level)
+    sentenceExplenation = singleTurnExplainer(sentence, isoBase, isoTarget, wordlist, level, finishedStory)
     print("\n")
     differentiated = lang_differentiator(sentenceExplenation, isoBase, isoTarget)
 
@@ -345,7 +435,7 @@ for sentence in storySentences:
     print(f"Token count: {differentiatedCount}")
 
 
-print("\n"+explainSentence(finishedStory["candidates"][0]["content"]["parts"][0]["text"], baselanguage, target_language, wordlist, level))
+#print("\n"+explainSentence(finishedStory["candidates"][0]["content"]["parts"][0]["text"], baselanguage, target_language, wordlist, level))
 
 print("\n \n")
 print("\033[92m" + "Now I should write an outro for the podcast" + "\033[0m")
