@@ -80,14 +80,13 @@ def lang_differentiator(sentence, baselanguage, targetlanguage):
         model="gpt-4o",
         messages=[
             {"role": "system", "content": """
-            You're an excellent for when it comes to differentiating languages from each other for a podcast.
-            Make sure to give the answer with separators (---) when switching languages to separate the languages one from another.
-            Always when using a Separator, you will start the sentence with the correct ISO-code of the language that you're writing in.
-            Do it as it is shown in the example below.
-            Be sure to always use the correct ISO-code for the language that you're writing in (always use the correct one that is provided by me).
-            Only return the separated text with the correct ISO-code for the language that you're writing in.
-            The text you're writing will be later separated by a regex function that will separate the text by the ISO-code.
-            make sure that you always pick the correct language even if it is for only a single word.
+
+             You are an expert in differentiating languages for a podcast. Your task is to separate text by language, following these rules:
+            1. Use separators (---) followed by the correct ISO language code when switching languages.
+            2. Only switch languages for actual words or phrases, not for punctuation or spaces.
+            3. Maintain the original sentence structure and punctuation.
+            4. Do not add any explanatory text; only provide the differentiated sentence. Your job is also not to help with the 
+            5. If you see a single word for a explenation purpose that is in an other language like the rest is has to be differentiated as well.
 
 
             """},
@@ -99,7 +98,7 @@ def lang_differentiator(sentence, baselanguage, targetlanguage):
 
             {"role": "assistant", "content": f""" ---DE "Was läuft bei dir Junge?" ---EN means 'What's up with you, boy?' in English if we want to be literal. But you can also translate it as: 'what's up dude' it is usually used in informal settings. But literally the word ---DE "läuft" ---EN means walking and ---DE Junge ---EN means boy. One last time the full sentence: ---DE Was läuft bei dir Junge? """},
 
-            {"role": "user", "content": f"""{sentence} """ },
+            {"role": "user", "content": f"""{sentence} // languages beeing used are {baselanguage} and {targetlanguage} """ },
 
         ],
     )

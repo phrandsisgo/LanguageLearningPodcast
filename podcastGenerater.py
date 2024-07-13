@@ -380,6 +380,9 @@ def singleTurnExplainer(sentence, baseIso, targetIso, wordList, level, fullStory
             4. Include cultural notes or usage tips if relevant.
             5. Aim for a concise yet informative explanation (maximum 7 sentences please don't go over that threshhold).
             6. End with a brief summary or a question to engage the listener.
+            7. Also try your best to not give any helps on how the words are supposed to sound like phonetically.
+            8. Super important is that you only use the languages {baseIso} and {targetIso} in the explanation and nothing else.
+            9. At least once the sentence should come fully translated in the language of {baseIso}.
 
             Remember, your explanation should flow naturally as part of a podcast, maintaining listener engagement between sentences.
             """
