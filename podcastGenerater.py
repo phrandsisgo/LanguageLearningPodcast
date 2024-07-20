@@ -2,6 +2,7 @@ import requests
 import json
 import re
 from openAiPodcastGenerator import lang_differentiator
+from savedocs import *
 
 try:
     import keys as Keys
@@ -59,7 +60,8 @@ def Introwriter(fullStory, targetLanguage, baseLanguage, level, ):
     promptForIntro = f"""Hi, you are an excellent introduction writer for a Podcast.
       I want you to write me an introduction for a language learning podcast that is for language learners who are learning {targetLanguage} at the {level} level.
        The introduction should be written only in {baseLanguage} and should not include any other languages.
-        You should write an introduction that is about the following story: {fullStory}.
+        You should write an introduction that is about the following story: "{fullStory}" .
+
         Now that you know the full story, keep in mind that as the last sentence, the listener will also hear this story in the language of {targetLanguage}.
         So, you should tell the listener something like "And now we're going to listen to the full story" in {baseLanguage}.
         Keep the introduction short and sweet."""
@@ -365,6 +367,32 @@ def multiTurnExplainer(sentence, baseIso, targetIso, wordList, level):
     else:
         return f"Error: {response.status_code} - {response.text}" 
     
+def generateTitle(story, language):
+    startPrompt = f"""
+    Hi, you are an excellent title writer for a podcast.
+    Your job is to generate a title for a language learning podcast.
+    That title should be in the {language} language and should be a title to the following story:
+    "{story}".
+    """
+    url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + api_key
+    headers = {'Content-Type': 'application/json'}
+    
+    data = {
+        "contents": [
+            {
+                "role": "user",
+                "parts": [{"text": startPrompt}]
+            }
+        ]
+    }
+    
+    response = requests.post(url, headers=headers, data=json.dumps(data))
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return f"Error: {response.status_code} - {response.text}"
+
+
 def singleTurnExplainer(sentence, baseIso, targetIso, wordList, level, fullStory):
     startPrompt = f"""
             As an expert language teacher for a podcast, explain the following sentence from a {targetIso} story to a {level} level learner of {targetIso}. The explanation should be in {baseIso}.
@@ -408,15 +436,25 @@ finishedStory = podcastgenerator(api_key, storyPrompt)
 isoBase = get_ISO(baselanguage)
 isoTarget = get_ISO(target_language)
 print(finishedStory)
+
+ensure_output_directory()
+storytitle = generateTitle(finishedStory["candidates"][0]["content"]["parts"][0]["text"], target_language)["candidates"][0]["content"]["parts"][0]["text"]
+print("the title of the story is: " + storytitle)
+filepath = generate_filepath(storytitle)
+create_empty_file(filepath)
 print("\n \n")
 #Intro
 finishedStory =finishedStory["candidates"][0]["content"]["parts"][0]["text"]
-print(Introwriter(storytext, target_language, baselanguage, level)["candidates"][0]["content"]["parts"][0]["text"])
+introText = Introwriter(finishedStory, target_language, baselanguage, level)
+print(introText["candidates"][0]["content"]["parts"][0]["text"])
+add_intro(filepath, introText["candidates"][0]["content"]["parts"][0]["text"])
 #the story
 print("\033[92m" + finishedStory + "\033[0m")
 #between part(the transition between the story and the explenation of the story)
 print("\n"+betweenPart(baselanguage)["candidates"][0]["content"]["parts"][0]["text"])
 storySentences = re.split('[.!?]', finishedStory)
+
+add_story(filepath, finishedStory["candidates"][0]["content"]["parts"][0]["text"])
 #story explenation
 def process_openai_object(openai_object):
     # Wandelt das OpenAIObject in einen JSON-String um
