@@ -2,4 +2,6 @@ keys.py
 linguatech-tts.json
 Audio
 __pycache__/
+keys.cpython-311.pyc
 *.pyc
+output
