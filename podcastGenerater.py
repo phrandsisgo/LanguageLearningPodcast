@@ -19,7 +19,7 @@ print("\033[92m" + f"your level is {level}" + "\033[0m")
 target_language = input("\033[93m" + 'what is the language that you are currently learning? \n' + "\033[0m").upper()
 storyInput = input('\033[92m' + 'what should the story be about (do not leave this empty)' + '\033[0m')
 print("\n \n ")
-storyPrompt =f"I want you to write me a story in {target_language} that is about" +storyInput 
+storyPrompt =f"I want you to write me a story in {target_language} that is about " +storyInput +f"be sure that the story is written in the level of {level} and using only wordsfrom the following language: {target_language}."
 print(" \n ")
 wordlist = ""
 wordlist = input("\033[93m" + "do you have a wordlist of words that you're currently studying? if yes paste it in. \n" + "\033[0m")
@@ -29,7 +29,7 @@ open_ai_tokens = 0
 if level!='N':
     endtext =f"{storyPrompt} that is also purely written in the level of {level} in {target_language}."
 if wordlist !="":
-    storytext = f"{storyPrompt} make sure that all words of the following wordlist are contained in the text {wordlist} and that it is written purely in {target_language}"
+    storytext = f"{storyPrompt} Make also sure that all words of the following wordlist are contained in the text {wordlist} and that it is written purely in {target_language}"
 #add the language
 storytext = f" The story that you are about to write is written only in the language of  {target_language}. {storytext} {endtext}"
 baselanguage = input("\033[93m" + 'what is the language that you want to have it teached? \n' + "\033[0m").upper()
@@ -440,7 +440,7 @@ print(finishedStory)
 ensure_output_directory()
 storytitle = generateTitle(finishedStory["candidates"][0]["content"]["parts"][0]["text"], target_language)["candidates"][0]["content"]["parts"][0]["text"]
 print("the title of the story is: " + storytitle)
-filepath = generate_filepath(storytitle)
+filepath = generate_filename(storytitle)
 create_empty_file(filepath)
 print("\n \n")
 #Intro
@@ -454,7 +454,7 @@ print("\033[92m" + finishedStory + "\033[0m")
 print("\n"+betweenPart(baselanguage)["candidates"][0]["content"]["parts"][0]["text"])
 storySentences = re.split('[.!?]', finishedStory)
 
-add_story(filepath, finishedStory["candidates"][0]["content"]["parts"][0]["text"])
+add_story(filepath, finishedStory)
 #story explenation
 def process_openai_object(openai_object):
     # Wandelt das OpenAIObject in einen JSON-String um

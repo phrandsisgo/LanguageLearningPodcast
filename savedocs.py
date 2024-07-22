@@ -6,7 +6,8 @@ def generate_filename(title):
     #Generates a filename based on title, date and time
     now = datetime.now()
     date_time = now.strftime("%Y%m%d-%H%M%S")
-    return f"{title}-{date_time}"
+    filename = f"{title}-{date_time}.json"
+    return os.path.join('output', filename)
 
 
 def generate_filepath(title):
@@ -29,8 +30,12 @@ def create_empty_file(filepath):
         "story": "",
         "explanations": []
     }
-    with open(filepath, 'w', encoding='utf-8') as f:
-        json.dump(initial_data, f, ensure_ascii=False, indent=2)
+    try:
+        with open(filepath, 'w', encoding='utf-8') as f:
+            json.dump(initial_data, f, ensure_ascii=False, indent=2)
+        print(f"The full path is {filepath}")
+    except Exception as e:
+        print(f"Error creating file: {e}")
 
 
 def add_intro(filepath, intro):
@@ -118,6 +123,12 @@ def analyze_output(filepath):
     
     return stats
 
+
+#this section is to try out the functions
+current_filepath = ""
+
+current_filepath = generate_filename("Test of Lisa")
+create_empty_file(current_filepath)
 #nun kann ich diese Funktionen noch im Hauptskript folgendermassen verwenden:
 #has to translated to english but I'm too tired to do it now
 """
