@@ -68,10 +68,19 @@ def Introwriter(fullStory, targetLanguage, baseLanguage, level, ):
     introduction =podcastgenerator(api_key, promptForIntro)
     return introduction
 
-def betweenPart(baselanguage):
-    promptForBetween = f"""Hi, you are writing a part of a podcast.
-    your job is it to translate the following sentence in the language of {baselanguage}:
-    "you heard now the full story, wow I hope there were a few words that you understood and some that are completely new to you. let's go over each sentence now and learn them together. " """
+def betweenPart(baselanguage, story):
+    promptForBetween = f"""
+    Hi, you are writing a part of a podcast for languagelearners and your part is the transition between the story and the explanation part of the story.
+    You will be provided with a story and you should just mention a very brief summary of the story that the listener is about to hear. 
+    before your part that you write the listener will hear the full story read in an normal speed. 
+    Your job is to write a transition that is in the {baselanguage} language and that is a transition between the story and the explanation of the story.
+    because after you the listener will hear the full story again but this time it's gonna be in a slower pace, and with translations and explenations for each sentence.
+
+    The story of the podcast is the following: "{story}".
+
+    Now that you know what the story is about answer only with the betweensection and nothing else. 
+    And make sure to only use the {baselanguage} language in your answer.
+    """
     inbetween_Part =podcastgenerator(api_key, promptForBetween)
     return inbetween_Part
 
@@ -455,7 +464,9 @@ add_intro(filepath, introText["candidates"][0]["content"]["parts"][0]["text"])
 #the story
 print("\033[92m" + finishedStory + "\033[0m")
 #between part(the transition between the story and the explenation of the story)
-print("\n"+betweenPart(baselanguage)["candidates"][0]["content"]["parts"][0]["text"])
+betweenPart = betweenPart(baselanguage, finishedStory)
+print("\n"+ betweenPart["candidates"][0]["content"]["parts"][0]["text"])
+add_betweenpart(filepath, betweenPart["candidates"][0]["content"]["parts"][0]["text"])
 storySentences = re.split('[.!?]', finishedStory)
 
 add_story(filepath, finishedStory)

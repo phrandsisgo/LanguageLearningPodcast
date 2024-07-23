@@ -30,8 +30,10 @@ def create_empty_file(filepath, target_language, base_language):
     initial_data = {
         "target_language": target_language,
         "base_language": base_language,
+        "date": datetime.now().strftime("%d.%m.%Y %H:%M:%S"),  # Modified date format
         "title": "",
         "intro": "",
+        "betweenpart": "",
         "story": "",
         "explanations": []
     }
@@ -99,6 +101,15 @@ def load_output(filepath):
     #Loads the content from a specific file
     with open(filepath, 'r', encoding='utf-8') as f:
         return json.load(f)
+
+def add_betweenpart(filepath, betweenpart):
+    #Adds a betweenpart to the JSON file
+    with open(filepath, 'r+', encoding='utf-8') as f:
+        data = json.load(f)
+        data['betweenpart'] = betweenpart
+        f.seek(0)
+        json.dump(data, f, ensure_ascii=False, indent=2)
+        f.truncate()
 
 def edit_content(filepath):
     #Opens a file for editing and saves the changes
