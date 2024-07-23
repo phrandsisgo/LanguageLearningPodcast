@@ -387,7 +387,9 @@ def generateTitle(story, language):
     }
     
     response = requests.post(url, headers=headers, data=json.dumps(data))
+    
     if response.status_code == 200:
+        print(f"Title of the story is: {response.json()['candidates'][0]['content']['parts'][0]['text']}")
         return response.json()
     else:
         return f"Error: {response.status_code} - {response.text}"
@@ -441,7 +443,9 @@ ensure_output_directory()
 storytitle = generateTitle(finishedStory["candidates"][0]["content"]["parts"][0]["text"], target_language)["candidates"][0]["content"]["parts"][0]["text"]
 print("the title of the story is: " + storytitle)
 filepath = generate_filename(storytitle)
-create_empty_file(filepath)
+create_empty_file(filepath, isoTarget, isoBase)
+add_story(filepath, finishedStory["candidates"][0]["content"]["parts"][0]["text"])
+
 print("\n \n")
 #Intro
 finishedStory =finishedStory["candidates"][0]["content"]["parts"][0]["text"]
