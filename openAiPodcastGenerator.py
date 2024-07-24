@@ -62,18 +62,15 @@ def Introwriter(fullStory, targetLanguage, baseLanguage, level, ):
 
 def emptyPromptFunction(prompt):
     response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4o", #alternative model: gpt-3.5-turbo
         messages=[
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": prompt},
         ],
     )
     message_content = response['choices'][0]['message']['content']
-    total_tokens = response['choices'][0]['total_tokens']
-    return {
-        "message": message_content,
-        "total_tokens": total_tokens
-    }
+   # total_tokens = response['choices'][0]['total_tokens']
+    return message_content
 
 def lang_differentiator(sentence, baselanguage, targetlanguage):
     response = openai.ChatCompletion.create(

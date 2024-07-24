@@ -1,7 +1,7 @@
 import requests
 import json
 import re
-from openAiPodcastGenerator import lang_differentiator
+from openAiPodcastGenerator import lang_differentiator, emptyPromptFunction
 from savedocs import *
 
 try:
@@ -443,21 +443,24 @@ def singleTurnExplainer(sentence, baseIso, targetIso, wordList, level, fullStory
     else:
         return f"Error: {response.status_code} - {response.text}"
 
-finishedStory = podcastgenerator(api_key, storyPrompt)
+#finishedStory = podcastgenerator(api_key, storyPrompt)
+finishedStory = emptyPromptFunction(storyPrompt)
 isoBase = get_ISO(baselanguage)
 isoTarget = get_ISO(target_language)
 print(finishedStory)
+if "candidates" in finishedStory:
+    finishedStory = finishedStory["candidates"][0]["content"]["parts"][0]["text"]
 
 ensure_output_directory()
-storytitle = generateTitle(finishedStory["candidates"][0]["content"]["parts"][0]["text"], target_language)["candidates"][0]["content"]["parts"][0]["text"]
+storytitle = generateTitle(finishedStory, target_language)["candidates"][0]["content"]["parts"][0]["text"]
 print("the title of the story is: " + storytitle)
 filepath = generate_filename(storytitle)
 create_empty_file(filepath, isoTarget, isoBase)
-add_story(filepath, finishedStory["candidates"][0]["content"]["parts"][0]["text"])
+add_title(filepath, storytitle)
+add_story(filepath, finishedStory)
 
 print("\n \n")
 #Intro
-finishedStory =finishedStory["candidates"][0]["content"]["parts"][0]["text"]
 introText = Introwriter(finishedStory, target_language, baselanguage, level)
 print(introText["candidates"][0]["content"]["parts"][0]["text"])
 add_intro(filepath, introText["candidates"][0]["content"]["parts"][0]["text"])

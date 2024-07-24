@@ -18,7 +18,7 @@ message = client.messages.create(
       "content": [
         {
           "type": "text",
-          "text": "Write me a story about lous who is frustrated to find a new apartment."
+          "text": "Write me a short story about louis who is frustrated to find a new apartment in Zürich."
         }
       ]
     }
