@@ -476,7 +476,7 @@ def process_openai_object(openai_object):
     json_str = json.dumps(openai_object)
     return json.loads(json_str)
 
-for sentence in storySentences:
+for index, sentence in enumerate(storySentences, start=1):
     sentenceExplenation = singleTurnExplainer(sentence, isoBase, isoTarget, wordlist, level, finishedStory)
     print("\n")
     differentiated = lang_differentiator(sentenceExplenation, isoBase, isoTarget)
@@ -489,6 +489,7 @@ for sentence in storySentences:
 
     print(f"Message: {differentiatedContent}")
     print(f"Token count: {differentiatedCount}")
+    append_explanation(filepath, sentence, differentiatedContent, index)
 
 
 #print("\n"+explainSentence(finishedStory["candidates"][0]["content"]["parts"][0]["text"], baselanguage, target_language, wordlist, level))

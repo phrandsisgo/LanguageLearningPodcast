@@ -71,13 +71,17 @@ def add_story(filepath, story):
         json.dump(data, f, ensure_ascii=False, indent=2, separators=(',', ': '))
         f.truncate()
 
-def append_explanation(filepath, explanation):
-    # Appends an explanation to the existing file
+def append_explanation(filepath, sentence, explanation, sentence_number):
     with open(filepath, 'r+', encoding='utf-8') as f:
         data = json.load(f)
-        data['explanations'].append(explanation)
+        explanation_entry = {
+            "sentence_number": sentence_number,
+            "sentence": sentence,
+            "explanation": explanation
+        }
+        data['explanations'].append(explanation_entry)
         f.seek(0)
-        json.dump(data, f, ensure_ascii=False, indent=2)
+        json.dump(data, f, ensure_ascii=False, indent=2, separators=(',', ': '))
         f.truncate()
 
 def save_output(title, content, token_usage=None):
@@ -158,40 +162,3 @@ intro = "This is a test of Lisa's story generation capabilities."
 story="Once upon a time, in a faraway land, there was a young prince named Diego. He was a brave and noble warrior, always ready to defend his kingdom from any threat. One day, a terrible dragon attacked the kingdom, breathing fire and destruction wherever it went. Diego knew that he was the only one who could stop the dragon and save his people. So he set out on a quest to find the dragon and defeat it once and for all. Along the way, he faced many dangers and challenges, but he never wavered in his determination. Finally, after a long and difficult journey, Diego reached the dragon's lair. With his sword in hand and his heart full of courage, he faced the dragon in a fierce battle. The dragon fought fiercely, but Diego was stronger and braver. In the end, he emerged victorious, the dragon lay defeated at his feet. The kingdom was saved, and Diego was hailed as a hero by all. And so, Diego returned to his kingdom, his head held high and his heart full of pride. He knew that no matter what challenges lay ahead, he would always be ready to face them with courage and honor."
 add_story(current_filepath, story)
 add_intro(current_filepath, intro)
-#nun kann ich diese Funktionen noch im Hauptskript folgendermassen verwenden:
-#has to translated to english but I'm too tired to do it now
-"""
-
-from save_docs import save_output, edit_content, analyze_output
-from your_other_modules import generate_story, lang_differentiator, generate_title
-
-# Generiere Titel
-title = generate_title()
-
-# Generiere Geschichte
-story, story_token_usage = generate_story()  # Angenommen, diese Funktion gibt auch Token-Nutzung zurück
-
-# Führe Sprachdifferenzierung durch
-differentiated, diff_token_usage = lang_differentiator(story, base_language, target_language)  # Ebenso hier
-
-# Speichere alle Daten
-token_usage = {
-    "story_generation": story_token_usage,
-    "language_differentiation": diff_token_usage
-}
-
-filepath = save_output(title, {
-    'title': title,
-    'original_story': story,
-    'differentiated_story': differentiated
-}, token_usage)
-
-# Erlaube Bearbeitung
-edit_content(filepath)
-
-# Analysiere die Ausgabe
-stats = analyze_output(filepath)
-print(f"Statistiken: {stats}")
-
-# Hier würden Sie mit der TTS-Vertonung fortfahren...
-"""
