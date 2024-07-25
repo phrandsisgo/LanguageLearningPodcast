@@ -130,6 +130,7 @@ filepath = generate_filename(storytitle)
 create_empty_file(filepath, isoTarget, isoBase)
 add_title(filepath, storytitle)
 add_story(filepath, finishedStory)
+add_wordList(filepath, wordlist)
 
 print("\n \n")
 #Intro

@@ -35,7 +35,8 @@ def create_empty_file(filepath, target_language, base_language):
         "intro": "",
         "betweenpart": "",
         "story": "",
-        "explanations": []
+        "explanations": [],
+        "wordList": ""
     }
     try:
         with open(filepath, 'w', encoding='utf-8') as f:
@@ -102,15 +103,21 @@ def save_output(title, content, token_usage=None):
     return full_path
 
 def load_output(filepath):
-    #Loads the content from a specific file
     with open(filepath, 'r', encoding='utf-8') as f:
         return json.load(f)
 
 def add_betweenpart(filepath, betweenpart):
-    #Adds a betweenpart to the JSON file
     with open(filepath, 'r+', encoding='utf-8') as f:
         data = json.load(f)
         data['betweenpart'] = betweenpart
+        f.seek(0)
+        json.dump(data, f, ensure_ascii=False, indent=2)
+        f.truncate()
+
+def add_wordList(filepath, wordList):
+    with open(filepath, 'r+', encoding='utf-8') as f:
+        data = json.load(f)
+        data['wordList'] = wordList
         f.seek(0)
         json.dump(data, f, ensure_ascii=False, indent=2)
         f.truncate()
