@@ -1,5 +1,10 @@
 import requests
 import json
+try:
+    import keys as Keys
+    api_key = Keys.gemini_key
+except ImportError:
+    api_key = input("Please enter your gemini API key: ")
 
 def podcastgenerator(api_key, text):
     url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=' + api_key
@@ -249,7 +254,7 @@ def generateTitle(story, language):
 
 
 
-def singleTurnExplainer(sentence, baseIso, targetIso, wordList, level, fullStory):
+def singleTurnExplainer(sentence, baseIso, targetIso, wordlist, level, fullStory):
     startPrompt = f"""
             As an expert language teacher for a podcast, explain the following sentence from a {targetIso} story to a {level} level learner of {targetIso}. The explanation should be in {baseIso}.
 

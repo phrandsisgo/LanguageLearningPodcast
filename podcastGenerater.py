@@ -28,8 +28,6 @@ baselanguage = input("\033[93m" + 'what is the language that you want to have it
 storyPrompt =f"I want you to write me a story in {target_language} that is about " +storyInput +f"be sure that the story is written in the level of {level} and using only wordsfrom the following language: {target_language}."
 if level!='N':
     endtext =f"{storyPrompt} that is also purely written in the level of {level} in {target_language}."
-#add the language
-storytext = f" The story that you are about to write is written only in the language of  {target_language}. {storytext} {endtext}"
 
 def generate_story_prompt(target_language, level, story_topic, wordlist=None):
     base_prompt = f"""
@@ -88,6 +86,7 @@ def get_wordlist():
 
 # Usage in your main code
 wordlist = get_wordlist()
+storyPrompt = generate_story_prompt(target_language, level, storyInput, wordlist)
 
 if wordlist:
     print("Wordlist provided. It will be incorporated into the story generation.")
@@ -172,19 +171,6 @@ def explainSentence(fullstory, baseLanguage, targetLanguage, wordlist=None, leve
     return combineedExplanations
 
 
-#finishedStory = podcastgenerator(api_key, storyPrompt)
-
-#for story prompt
-"""
-# Later in your code, when you need to use the wordlist:
-if wordlist:
-    # Use the wordlist in your story generation
-    story_prompt = generate_story_prompt(target_language, level, story_topic, wordlist)
-else:
-    # Generate story without a wordlist
-    story_prompt = generate_story_prompt(target_language, level, story_topic)
-
-"""
 
 
 finishedStory = emptyPromptFunction(storyPrompt)
