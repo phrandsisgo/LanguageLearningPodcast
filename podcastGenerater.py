@@ -20,22 +20,79 @@ print("\033[92m" + f"your level is {level}" + "\033[0m")
 target_language = input("\033[93m" + 'what is the language that you are currently learning? \n' + "\033[0m").upper()
 storyInput = input('\033[92m' + 'what should the story be about (do not leave this empty)' + '\033[0m')
 print("\n \n ")
-storyPrompt =f"I want you to write me a story in {target_language} that is about " +storyInput +f"be sure that the story is written in the level of {level} and using only wordsfrom the following language: {target_language}."
 print(" \n ")
-wordlist = ""
-wordlist = input("\033[93m" + "do you have a wordlist of words that you're currently studying? if yes paste it in. \n" + "\033[0m")
 print(" \n ")
 endtext=""
 open_ai_tokens = 0
+baselanguage = input("\033[93m" + 'what is the language that you want to have it teached? \n' + "\033[0m").upper()
+storyPrompt =f"I want you to write me a story in {target_language} that is about " +storyInput +f"be sure that the story is written in the level of {level} and using only wordsfrom the following language: {target_language}."
 if level!='N':
     endtext =f"{storyPrompt} that is also purely written in the level of {level} in {target_language}."
-if wordlist !="":
-    storytext = f"{storyPrompt} Make also sure that all words of the following wordlist are contained in the text {wordlist} and that it is written purely in {target_language}"
 #add the language
 storytext = f" The story that you are about to write is written only in the language of  {target_language}. {storytext} {endtext}"
-baselanguage = input("\033[93m" + 'what is the language that you want to have it teached? \n' + "\033[0m").upper()
+
+def generate_story_prompt(target_language, level, story_topic, wordlist=None):
+    base_prompt = f"""
+    Create an engaging story in {target_language} based on the following topic and requirements:
+
+    Topic and Special Requirements: "{story_topic}"
+
+    Note: The topic and requirements above may be provided in any language, but your task is to write the story entirely in {target_language}. Pay close attention to any specific instructions regarding grammar, tense, or other linguistic aspects mentioned in the topic.
+
+    The story should be appropriate for language learners at the {level} level.
+    Ensure the story uses vocabulary and grammar structures suitable for this level, while also incorporating any specific grammatical requirements mentioned in the topic (e.g., using a particular tense).
+
+    Guidelines:
+    1. Write the entire story in {target_language}, regardless of the language of the provided topic and requirements.
+    2. Strictly adhere to any grammatical or structural requirements specified in the topic (such as using a specific tense or focusing on particular grammar points).
+    3. Use clear and concise language appropriate for {level} learners.
+    4. Include a variety of sentence structures typical for {level}, unless the topic specifies a focus on particular structures.
+    5. Ensure the story has a clear beginning, middle, and end.
+    6. Aim for a story length of approximately 250-300 words.
+    """
+    
+    if wordlist:
+            word_integration = f"""
+            Additionally, you must incorporate words from the following wordlist into the story:
+
+            {wordlist}
+
+            Important notes about word usage:
+            - Interpret the wordlist in the most appropriate way. It may be a simple list, comma-separated, JSON format, or any other structure.
+            - Try to include as many words or concepts from this list as possible in the story.
+            - You have the flexibility to use different forms of the words as appropriate:
+            - For verbs: You may conjugate them or use different tenses as needed, ensuring consistency with any tense requirements specified in the topic.
+            - For nouns: You may use singular or plural forms.
+            - For adjectives: You may use comparatives or superlatives if it fits the context.
+            - The goal is to include the words or their concepts naturally within the story's context.
+            - Use these words or their variations in a way that helps illustrate their meaning.
+            """
+            base_prompt += word_integration
+        
+    base_prompt += f"\nPlease provide the story in {target_language}, ensuring you follow all specified requirements:"
+    
+    return base_prompt
 
 
+def get_wordlist():
+    print("\033[93mDo you have a wordlist of words that you're currently studying?")
+    print("You can enter words in any format: plain text, comma-separated, JSON, or any other structure.")
+    print("If you don't have a wordlist, just press Enter to skip.\033[0m")
+    
+    wordlist_input = input("Enter your wordlist (or press Enter to skip): ").strip()
+    
+    if not wordlist_input:
+        return None
+    
+    return wordlist_input
+
+# Usage in your main code
+wordlist = get_wordlist()
+
+if wordlist:
+    print("Wordlist provided. It will be incorporated into the story generation.")
+else:
+    print("No wordlist provided.")
 
 
 def Introwriter(fullStory, targetLanguage, baseLanguage, level, ):
@@ -116,6 +173,20 @@ def explainSentence(fullstory, baseLanguage, targetLanguage, wordlist=None, leve
 
 
 #finishedStory = podcastgenerator(api_key, storyPrompt)
+
+#for story prompt
+"""
+# Later in your code, when you need to use the wordlist:
+if wordlist:
+    # Use the wordlist in your story generation
+    story_prompt = generate_story_prompt(target_language, level, story_topic, wordlist)
+else:
+    # Generate story without a wordlist
+    story_prompt = generate_story_prompt(target_language, level, story_topic)
+
+"""
+
+
 finishedStory = emptyPromptFunction(storyPrompt)
 isoBase = get_ISO(baselanguage)
 isoTarget = get_ISO(target_language)
