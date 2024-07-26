@@ -72,12 +72,13 @@ def add_story(filepath, story):
         json.dump(data, f, ensure_ascii=False, indent=2, separators=(',', ': '))
         f.truncate()
 
-def append_explanation(filepath, sentence, explanation, sentence_number):
+def append_explanation(filepath, sentence, explanation,raw_explanation, sentence_number):
     with open(filepath, 'r+', encoding='utf-8') as f:
         data = json.load(f)
         explanation_entry = {
             "sentence_number": sentence_number,
             "sentence": sentence,
+            "raw_explanation": raw_explanation,
             "explanation": explanation
         }
         data['explanations'].append(explanation_entry)

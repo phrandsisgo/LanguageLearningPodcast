@@ -1,7 +1,7 @@
 import requests
 import json
 import re
-from openAiPodcastGenerator import lang_differentiator, emptyPromptFunction
+from openAiPodcastGenerator import lang_differentiator, emptyPromptFunction, empty_GPT4o_mini
 from gemini_functions import *
 from savedocs import *
 
@@ -126,6 +126,29 @@ def updateTokens(currentTokens, newTokens):
     currentTokens += newTokens
     return currentTokens
 
+def explainPrompter(sentence, baseIso, targetIso, wordlist, level, fullStory):
+    startPrompt = f"""
+            As an expert language teacher for a podcast, explain the following sentence from a {targetIso} story to a {level} level learner of {targetIso}. The explanation should be in {baseIso}.
+
+            for context here's the full story for context: {fullStory}
+
+            Current sentence to explain: "{sentence}"
+
+            Guidelines:
+            1. Start with a smooth transition (e.g., "Let's move on to the next part." or "Now, we encounter an interesting phrase.")
+            2. Explain the sentence, focusing on its meaning and any challenging words or structures.
+            3. If the sentence contains words from this list: {wordlist}, provide extra explanation and examples.
+            4. Include cultural notes or usage tips if relevant.
+            5. Aim for a concise yet informative explanation (maximum 7 sentences please don't go over that threshhold).
+            6. End with a brief summary or a question to engage the listener.
+            7. Also try your best to not give any helps on how the words are supposed to sound like phonetically.
+            8. Super important is that you only use the languages {baseIso} and {targetIso} in the explanation and nothing else.
+            9. At least once the sentence should come fully translated in the language of {baseIso}.
+
+            Remember, your explanation should flow naturally as part of a podcast, maintaining listener engagement between sentences.
+            """
+    return startPrompt
+
 def explainSentence(fullstory, baseLanguage, targetLanguage, wordlist=None, level=None):
     sentences = re.split('[.!?]', fullstory)
     #sentences = re.findall(r'[^.!?]+[.!?]', fullstory) ## With this the punctuation is included in the sentence.
@@ -210,7 +233,8 @@ def process_openai_object(openai_object):
     return json.loads(json_str)
 
 for index, sentence in enumerate(storySentences, start=1):
-    sentenceExplenation = singleTurnExplainer(sentence, isoBase, isoTarget, wordlist, level, finishedStory)
+    explenationPrompt = explainPrompter(sentence, isoBase, isoTarget, wordlist, level, finishedStory)
+    sentenceExplenation = empty_GPT4o_mini(explenationPrompt)
     print("\n")
     differentiated = lang_differentiator(sentenceExplenation, isoBase, isoTarget)
 
@@ -222,7 +246,7 @@ for index, sentence in enumerate(storySentences, start=1):
 
     print(f"Message: {differentiatedContent}")
     print(f"Token count: {differentiatedCount}")
-    append_explanation(filepath, sentence, differentiatedContent, index)
+    append_explanation(filepath, sentence, differentiatedContent, sentenceExplenation, index)
 
 
 #print("\n"+explainSentence(finishedStory["candidates"][0]["content"]["parts"][0]["text"], baselanguage, target_language, wordlist, level))
