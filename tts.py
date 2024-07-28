@@ -46,11 +46,7 @@ def openai_tts(text, output_file="output.mp3"):
         print(f"Error: {response.status_code}")
         print(response.json())
 
-def synthesize_text_RU(text, speed=0.9):
-    # Text to be converted to speech
-    # text = "Hello,<break time='1.5s'/> how are you today?"
-
-    # Configuration of the request
+def synthesize_text_RU(text, speed=0.9, path_name= None):
     synthesis_input = texttospeech.SynthesisInput(ssml=text)
     voice = texttospeech.VoiceSelectionParams(
         language_code="ru-RU",  # Russian
@@ -76,11 +72,14 @@ def synthesize_text_RU(text, speed=0.9):
     # Create the Audio folder if it doesn't exist
     audio_dir = os.path.join(current_dir, "Audio")
     os.makedirs(audio_dir, exist_ok=True)
+    if path_name is None:
+        # Get the number of existing audio files
+        existing_files = len(os.listdir(audio_dir))
+        # Generate the new file name
+        new_file_name = f"{existing_files + 1}Test.mp3"
+    else:
+        new_file_name = f"{path_name}.mp3"
 
-    # Get the number of existing audio files
-    existing_files = len(os.listdir(audio_dir))
-    # Generate the new file name
-    new_file_name = f"{existing_files + 1}Test.mp3"
     output_file = os.path.join(audio_dir, new_file_name)
 
     # Save the response (as an MP3 file)
@@ -90,7 +89,7 @@ def synthesize_text_RU(text, speed=0.9):
 
     return output_file
 
-def synthesize_text_ES(text, speed=0.9):
+def synthesize_text_ES(text, speed=0.9, path_name= None):
     # Text, der in Sprache umgewandelt werden soll
     # text = "Hallo,<break time='1.5s'/> wie geht es dir heute?"
 
@@ -120,11 +119,14 @@ def synthesize_text_ES(text, speed=0.9):
     # Create the Audio folder if it doesn't exist
     audio_dir = os.path.join(current_dir, "Audio")
     os.makedirs(audio_dir, exist_ok=True)
-
-    # Get the number of existing audio files
-    existing_files = len(os.listdir(audio_dir))
-    # Generate the new file name
-    new_file_name = f"{existing_files + 1}.mp3"
+    if path_name is None:
+        # Get the number of existing audio files
+        existing_files = len(os.listdir(audio_dir))
+        # Generate the new file name
+        new_file_name = f"{existing_files + 1}Test.mp3"
+    else:
+        new_file_name = f"{path_name}.mp3"
+    
     output_file = os.path.join(audio_dir, new_file_name)
 
     # Die Antwort speichern (als MP3-Datei)
@@ -134,7 +136,7 @@ def synthesize_text_ES(text, speed=0.9):
 
     return output_file
 
-def synthesize_text_EN(inputText, speed=1):
+def synthesize_text_EN(inputText, speed=1, path_name= None):
     # Text, der in Sprache umgewandelt werden soll
     # text = "Hallo,<break time='1.5s'/> wie geht es dir heute?"
 
@@ -165,12 +167,15 @@ def synthesize_text_EN(inputText, speed=1):
     audio_dir = os.path.join(current_dir, "Audio")
     os.makedirs(audio_dir, exist_ok=True)
 
-    # Get the number of existing audio files
-    existing_files = len(os.listdir(audio_dir))
-    # Generate the new file name
-    new_file_name = f"{existing_files + 1}.mp3"
-    output_file = os.path.join(audio_dir, new_file_name)
+    if path_name is None:
+        # Get the number of existing audio files
+        existing_files = len(os.listdir(audio_dir))
+        # Generate the new file name
+        new_file_name = f"{existing_files + 1}Test.mp3"
+    else:
+        new_file_name = f"{path_name}.mp3"
 
+    output_file = os.path.join(audio_dir, new_file_name)
     # Die Antwort speichern (als MP3-Datei)
     with open(output_file, "wb") as out:
         out.write(response.audio_content)
