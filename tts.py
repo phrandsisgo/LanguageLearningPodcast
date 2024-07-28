@@ -6,7 +6,7 @@ documentation = "https://cloud.google.com/text-to-speech/docs/quickstart-client-
 # Replace 'your_api_key.json' with the path to your API key
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-client = texttospeech.TextToSpeechClient.from_service_account_json('your-api-key.json') # would be much nicer if we could use the keys.py file to simply put the api key here
+client = texttospeech.TextToSpeechClient.from_service_account_json('linguatech-tts.json') 
 
 try:
     import keys as Keys
@@ -129,7 +129,7 @@ def synthesize_text_ES(text, speed=0.9, path_name= None):
     
     output_file = os.path.join(audio_dir, new_file_name)
 
-    # Die Antwort speichern (als MP3-Datei)
+    # Save the answer (as MP3-File)
     with open(output_file, "wb") as out:
         out.write(response.audio_content)
         print("Audioinhalt in 'output_file' geschrieben.")
@@ -137,8 +137,6 @@ def synthesize_text_ES(text, speed=0.9, path_name= None):
     return output_file
 
 def synthesize_text_EN(inputText, speed=1, path_name= None):
-    # Text, der in Sprache umgewandelt werden soll
-    # text = "Hallo,<break time='1.5s'/> wie geht es dir heute?"
 
     # Konfiguration der Anfrage
     synthesis_input = texttospeech.SynthesisInput(ssml=inputText)
@@ -176,10 +174,52 @@ def synthesize_text_EN(inputText, speed=1, path_name= None):
         new_file_name = f"{path_name}.mp3"
 
     output_file = os.path.join(audio_dir, new_file_name)
-    # Die Antwort speichern (als MP3-Datei)
+    # Save the answer (as MP3-File)
     with open(output_file, "wb") as out:
         out.write(response.audio_content)
         print("Audioinhalt in 'output_file' geschrieben.")
     return output_file
 
-synthesize_text_RU("<speak>это было утомительно.</speak>", 0.5)
+def synthesize_text_DE(inputText, speed=1, path_name= None):
+    
+        # Konfiguration der Anfrage
+        synthesis_input = texttospeech.SynthesisInput(ssml=inputText)
+        voice = texttospeech.VoiceSelectionParams(
+            language_code="de-DE",  # German
+            name="de-DE-Polyglot-1",
+        )
+        audio_config = texttospeech.AudioConfig(
+            audio_encoding=texttospeech.AudioEncoding.MP3,
+            speaking_rate=speed,
+            pitch=-0.50
+        )
+
+        # Anfrage senden und Antwort erhalten
+        response = client.synthesize_speech(
+            input=synthesis_input,
+            voice=voice,
+            audio_config=audio_config
+        )
+
+        # Get the current directory
+        current_dir = os.getcwd()
+
+        # Create the Audio folder if it doesn't exist
+        audio_dir = os.path.join(current_dir, "Audio")
+        os.makedirs(audio_dir, exist_ok=True)
+
+        if path_name is None:
+            # Get the number of existing audio files
+            existing_files = len(os.listdir(audio_dir))
+            # Generate the new file name
+            new_file_name = f"{existing_files + 1}Test.mp3"
+        else:
+            new_file_name = f"{path_name}.mp3"
+
+        output_file = os.path.join(audio_dir, new_file_name)
+        # Save the answer (as MP3-File)
+        with open(output_file, "wb") as out:
+            out.write(response.audio_content)
+            print("Audioinhalt in 'output_file' geschrieben.")
+        return output_file
+synthesize_text_DE("<speak>Wie geht es dir heute an diesem Tag?</speak>", 0.8, "hallo deutsch") # Test
