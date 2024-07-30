@@ -181,8 +181,6 @@ def synthesize_text_EN(inputText, speed=1, path_name= None):
     return output_file
 
 def synthesize_text_DE(inputText, speed=1, path_name= None):
-    
-        # Konfiguration der Anfrage
         synthesis_input = texttospeech.SynthesisInput(ssml=inputText)
         voice = texttospeech.VoiceSelectionParams(
             language_code="de-DE",  # German
@@ -194,7 +192,6 @@ def synthesize_text_DE(inputText, speed=1, path_name= None):
             pitch=-0.50
         )
 
-        # Anfrage senden und Antwort erhalten
         response = client.synthesize_speech(
             input=synthesis_input,
             voice=voice,
@@ -209,10 +206,8 @@ def synthesize_text_DE(inputText, speed=1, path_name= None):
         os.makedirs(audio_dir, exist_ok=True)
 
         if path_name is None:
-            # Get the number of existing audio files
             existing_files = len(os.listdir(audio_dir))
-            # Generate the new file name
-            new_file_name = f"{existing_files + 1}Test.mp3"
+            new_file_name = f"{existing_files + 1}Test.mp3" # Generate the new file name
         else:
             new_file_name = f"{path_name}.mp3"
 
@@ -220,6 +215,77 @@ def synthesize_text_DE(inputText, speed=1, path_name= None):
         # Save the answer (as MP3-File)
         with open(output_file, "wb") as out:
             out.write(response.audio_content)
-            print("Audioinhalt in 'output_file' geschrieben.")
+            print("audio written to 'output_file'.")
         return output_file
-synthesize_text_DE("<speak>Wie geht es dir heute an diesem Tag?</speak>", 0.8, "hallo deutsch") # Test
+
+def synthesize_text_FR(inputText, speed=1, path_name= None):
+        synthesis_input = texttospeech.SynthesisInput(ssml=inputText)
+        voice = texttospeech.VoiceSelectionParams(
+            language_code="fr-FR",  # French
+            name="fr-FR-Polyglot-1",
+        )
+        audio_config = texttospeech.AudioConfig(
+            audio_encoding=texttospeech.AudioEncoding.MP3,
+            speaking_rate=speed,
+            pitch=-0.50
+        )
+        response = client.synthesize_speech(
+            input=synthesis_input,
+            voice=voice,
+            audio_config=audio_config
+        )
+        current_dir = os.getcwd()# Get the current directory
+
+        # Create the Audio folder if it doesn't exist
+        audio_dir = os.path.join(current_dir, "Audio")
+        os.makedirs(audio_dir, exist_ok=True)
+
+        if path_name is None:
+            existing_files = len(os.listdir(audio_dir))
+            new_file_name = f"{existing_files + 1}Test.mp3" # Generate the new file name
+        else:
+            new_file_name = f"{path_name}.mp3"
+
+        output_file = os.path.join(audio_dir, new_file_name)
+        # Save the answer (as MP3-File)
+        with open(output_file, "wb") as out:
+            out.write(response.audio_content)
+            print("audio written to 'output_file'.")
+        return output_file
+
+def synthesize_text_PT(inputText, speed=1, path_name= None):
+        synthesis_input = texttospeech.SynthesisInput(ssml=inputText)
+        voice = texttospeech.VoiceSelectionParams(
+            language_code="pt-BR",  # Portuguese
+            name="pt-BR-Wavenet-D",
+        )
+        audio_config = texttospeech.AudioConfig(
+            audio_encoding=texttospeech.AudioEncoding.MP3,
+            speaking_rate=speed,
+            pitch=-2.80
+        )
+        response = client.synthesize_speech(
+            input=synthesis_input,
+            voice=voice,
+            audio_config=audio_config
+        )
+        current_dir = os.getcwd()# Get the current directory
+
+        # Create the Audio folder if it doesn't exist
+        audio_dir = os.path.join(current_dir, "Audio")
+        os.makedirs(audio_dir, exist_ok=True)
+
+        if path_name is None:
+            existing_files = len(os.listdir(audio_dir))
+            new_file_name = f"{existing_files + 1}Test.mp3" # Generate the new file name
+        else:
+            new_file_name = f"{path_name}.mp3"
+
+        output_file = os.path.join(audio_dir, new_file_name)
+        # Save the answer (as MP3-File)
+        with open(output_file, "wb") as out:
+            out.write(response.audio_content)
+            print("audio written to 'output_file'.")
+        return output_file
+# languages available so far: EN, DE, ES, RU , FR, PT
+synthesize_text_PT("<speak>Quando tem feijoada na casa de Maria, ela convida alguns amigos para almoçar junto com ela.</speak>", 0.8, "hallo pt") # Test
