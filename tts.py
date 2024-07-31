@@ -20,22 +20,20 @@ except ImportError:
     project_id = input("Please enter your OpenAI project ID: ")
 
 def tts_decisioner(language, text, speed=1, path_name= None):
-    #sanitize text so that it can be used in SSML
-
-    text = re.sub(r'\s+', ' ', text)
     print("\033[92m" + text + "\033[0m")
+    ssml_text =f"<speak>{text}</speak>"
     if language == "EN":
-        return synthesize_text_EN(text, speed, path_name)
+        return synthesize_text_EN(ssml_text, speed, path_name)
     elif language == "DE":
-        return synthesize_text_DE(text, speed, path_name)
+        return synthesize_text_DE(ssml_text, speed, path_name)
     elif language == "ES":
-        return synthesize_text_ES(text, speed, path_name)
+        return synthesize_text_ES(ssml_text, speed, path_name)
     elif language == "RU":
-        return synthesize_text_RU(text, speed, path_name)
+        return synthesize_text_RU(ssml_text, speed, path_name)
     elif language == "FR":
-        return synthesize_text_FR(text, speed, path_name)
+        return synthesize_text_FR(ssml_text, speed, path_name)
     elif language == "PT":
-        return synthesize_text_PT(text, speed, path_name)
+        return synthesize_text_PT(ssml_text, speed, path_name)
     else:
         return openai_tts(text, path_name, speed)
 
@@ -91,18 +89,17 @@ def synthesize_text_RU(text, speed=0.9, path_name= None):
     # Get the current directory
     current_dir = os.getcwd()
 
-    # Create the Audio folder if it doesn't exist
-    audio_dir = os.path.join(current_dir, "Audio")
-    os.makedirs(audio_dir, exist_ok=True)
     if path_name is None:
-        # Get the number of existing audio files
+        # If no path_name is given, we generate a new file name
+        audio_dir = os.path.join(current_dir, "Audio")
+        os.makedirs(audio_dir, exist_ok=True)
         existing_files = len(os.listdir(audio_dir))
-        # Generate the new file name
-        new_file_name = f"{existing_files + 1}Test.mp3"
+        output_file = os.path.join(audio_dir, f"{existing_files + 1}Test.mp3")
     else:
-        new_file_name = f"{path_name}.mp3"
+        output_file = f"{path_name}.mp3"
 
-    output_file = os.path.join(audio_dir, new_file_name)
+    # Ensure that the directory exists
+    os.makedirs(os.path.dirname(output_file), exist_ok=True)
 
     # Save the response (as an MP3 file)
     with open(output_file, "wb") as out:
@@ -138,18 +135,17 @@ def synthesize_text_ES(text, speed=0.9, path_name= None):
     # Get the current directory
     current_dir = os.getcwd()
 
-    # Create the Audio folder if it doesn't exist
-    audio_dir = os.path.join(current_dir, "Audio")
-    os.makedirs(audio_dir, exist_ok=True)
     if path_name is None:
-        # Get the number of existing audio files
+        # If no path_name is given, we generate a new file name
+        audio_dir = os.path.join(current_dir, "Audio")
+        os.makedirs(audio_dir, exist_ok=True)
         existing_files = len(os.listdir(audio_dir))
-        # Generate the new file name
-        new_file_name = f"{existing_files + 1}Test.mp3"
+        output_file = os.path.join(audio_dir, f"{existing_files + 1}Test.mp3")
     else:
-        new_file_name = f"{path_name}.mp3"
-    
-    output_file = os.path.join(audio_dir, new_file_name)
+        output_file = f"{path_name}.mp3"
+
+    # Ensure that the directory exists
+    os.makedirs(os.path.dirname(output_file), exist_ok=True)
 
     # Save the answer (as MP3-File)
     with open(output_file, "wb") as out:
@@ -180,22 +176,20 @@ def synthesize_text_EN(inputText, speed=1, path_name= None):
         audio_config=audio_config
     )
     
-    # Get the current directory
+        # Get the current directory
     current_dir = os.getcwd()
 
-    # Create the Audio folder if it doesn't exist
-    audio_dir = os.path.join(current_dir, "Audio")
-    os.makedirs(audio_dir, exist_ok=True)
-
     if path_name is None:
-        # Get the number of existing audio files
+        # If no path_name is given, we generate a new file name
+        audio_dir = os.path.join(current_dir, "Audio")
+        os.makedirs(audio_dir, exist_ok=True)
         existing_files = len(os.listdir(audio_dir))
-        # Generate the new file name
-        new_file_name = f"{existing_files + 1}Test.mp3"
+        output_file = os.path.join(audio_dir, f"{existing_files + 1}Test.mp3")
     else:
-        new_file_name = f"{path_name}.mp3"
+        output_file = f"{path_name}.mp3"
 
-    output_file = os.path.join(audio_dir, new_file_name)
+    # Ensure that the directory exists
+    os.makedirs(os.path.dirname(output_file), exist_ok=True)
     # Save the answer (as MP3-File)
     with open(output_file, "wb") as out:
         out.write(response.audio_content)
@@ -223,17 +217,17 @@ def synthesize_text_DE(inputText, speed=1, path_name= None):
         # Get the current directory
         current_dir = os.getcwd()
 
-        # Create the Audio folder if it doesn't exist
-        audio_dir = os.path.join(current_dir, "Audio")
-        os.makedirs(audio_dir, exist_ok=True)
-
         if path_name is None:
+            # If no path_name is given, we generate a new file name
+            audio_dir = os.path.join(current_dir, "Audio")
+            os.makedirs(audio_dir, exist_ok=True)
             existing_files = len(os.listdir(audio_dir))
-            new_file_name = f"{existing_files + 1}Test.mp3" # Generate the new file name
+            output_file = os.path.join(audio_dir, f"{existing_files + 1}Test.mp3")
         else:
-            new_file_name = f"{path_name}.mp3"
-
-        output_file = os.path.join(audio_dir, new_file_name)
+            output_file = f"{path_name}.mp3"
+    
+        # Ensure that the directory exists
+        os.makedirs(os.path.dirname(output_file), exist_ok=True)
         # Save the answer (as MP3-File)
         with open(output_file, "wb") as out:
             out.write(response.audio_content)
@@ -241,73 +235,77 @@ def synthesize_text_DE(inputText, speed=1, path_name= None):
         return output_file
 
 def synthesize_text_FR(inputText, speed=1, path_name= None):
-        synthesis_input = texttospeech.SynthesisInput(ssml=inputText)
-        voice = texttospeech.VoiceSelectionParams(
-            language_code="fr-FR",  # French
-            name="fr-FR-Polyglot-1",
-        )
-        audio_config = texttospeech.AudioConfig(
-            audio_encoding=texttospeech.AudioEncoding.MP3,
-            speaking_rate=speed,
-            pitch=-0.50
-        )
-        response = client.synthesize_speech(
-            input=synthesis_input,
-            voice=voice,
-            audio_config=audio_config
-        )
-        current_dir = os.getcwd()# Get the current directory
+    synthesis_input = texttospeech.SynthesisInput(ssml=inputText)
+    voice = texttospeech.VoiceSelectionParams(
+        language_code="fr-FR",  # French
+        name="fr-FR-Polyglot-1",
+    )
+    audio_config = texttospeech.AudioConfig(
+        audio_encoding=texttospeech.AudioEncoding.MP3,
+        speaking_rate=speed,
+        pitch=-0.50
+    )
+    response = client.synthesize_speech(
+        input=synthesis_input,
+        voice=voice,
+        audio_config=audio_config
+    )
 
-        # Create the Audio folder if it doesn't exist
+    # Get the current directory
+    current_dir = os.getcwd()
+
+    if path_name is None:
+        # If no path_name is given, we generate a new file name
         audio_dir = os.path.join(current_dir, "Audio")
         os.makedirs(audio_dir, exist_ok=True)
+        existing_files = len(os.listdir(audio_dir))
+        output_file = os.path.join(audio_dir, f"{existing_files + 1}Test.mp3")
+    else:
+        output_file = f"{path_name}.mp3"
 
-        if path_name is None:
-            existing_files = len(os.listdir(audio_dir))
-            new_file_name = f"{existing_files + 1}Test.mp3" # Generate the new file name
-        else:
-            new_file_name = f"{path_name}.mp3"
-
-        output_file = os.path.join(audio_dir, new_file_name)
-        # Save the answer (as MP3-File)
-        with open(output_file, "wb") as out:
-            out.write(response.audio_content)
-            print("audio written to 'output_file'.")
-        return output_file
+    # Ensure that the directory exists
+    os.makedirs(os.path.dirname(output_file), exist_ok=True)
+    # Save the answer (as MP3-File)
+    with open(output_file, "wb") as out:
+        out.write(response.audio_content)
+        print("audio written to 'output_file'.")
+    return output_file
 
 def synthesize_text_PT(inputText, speed=1, path_name= None):
-        synthesis_input = texttospeech.SynthesisInput(ssml=inputText)
-        voice = texttospeech.VoiceSelectionParams(
-            language_code="pt-BR",  # Portuguese
-            name="pt-BR-Wavenet-D",
-        )
-        audio_config = texttospeech.AudioConfig(
-            audio_encoding=texttospeech.AudioEncoding.MP3,
-            speaking_rate=speed,
-            pitch=-2.80
-        )
-        response = client.synthesize_speech(
-            input=synthesis_input,
-            voice=voice,
-            audio_config=audio_config
-        )
-        current_dir = os.getcwd()# Get the current directory
+    synthesis_input = texttospeech.SynthesisInput(ssml=inputText)
+    voice = texttospeech.VoiceSelectionParams(
+        language_code="pt-BR",  # Portuguese
+        name="pt-BR-Wavenet-D",
+    )
+    audio_config = texttospeech.AudioConfig(
+        audio_encoding=texttospeech.AudioEncoding.MP3,
+        speaking_rate=speed,
+        pitch=-2.80
+    )
+    response = client.synthesize_speech(
+        input=synthesis_input,
+        voice=voice,
+        audio_config=audio_config
+    )
+    
+    # Get the current directory
+    current_dir = os.getcwd()
 
-        # Create the Audio folder if it doesn't exist
+    if path_name is None:
+        # If no path_name is given, we generate a new file name
         audio_dir = os.path.join(current_dir, "Audio")
         os.makedirs(audio_dir, exist_ok=True)
+        existing_files = len(os.listdir(audio_dir))
+        output_file = os.path.join(audio_dir, f"{existing_files + 1}Test.mp3")
+    else:
+        output_file = f"{path_name}.mp3"
 
-        if path_name is None:
-            existing_files = len(os.listdir(audio_dir))
-            new_file_name = f"{existing_files + 1}Test.mp3" # Generate the new file name
-        else:
-            new_file_name = f"{path_name}.mp3"
-
-        output_file = os.path.join(audio_dir, new_file_name)
-        # Save the answer (as MP3-File)
-        with open(output_file, "wb") as out:
-            out.write(response.audio_content)
-            print("audio written to 'output_file'.")
-        return output_file
+    # Ensure that the directory exists
+    os.makedirs(os.path.dirname(output_file), exist_ok=True)
+    # Save the answer (as MP3-File)
+    with open(output_file, "wb") as out:
+        out.write(response.audio_content)
+        print("audio written to 'output_file'.")
+    return output_file
 # languages available so far: EN, DE, ES, RU , FR, PT
 synthesize_text_PT("<speak>Quando tem feijoada na casa de Maria, ela convida alguns amigos para almoçar junto com ela.</speak>", 0.8, "hallo pt") # Test
