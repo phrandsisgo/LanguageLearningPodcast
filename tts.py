@@ -2,6 +2,7 @@ from google.cloud import texttospeech
 import os
 import sys
 import requests
+import re
 documentation = "https://cloud.google.com/text-to-speech/docs/quickstart-client-libraries#client-libraries-install-python"
 # Replace 'your_api_key.json' with the path to your API key
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -18,7 +19,27 @@ except ImportError:
     organization_id = input("Please enter your OpenAI organization ID: ")
     project_id = input("Please enter your OpenAI project ID: ")
 
-def openai_tts(text, output_file="output.mp3"):
+def tts_decisioner(language, text, speed=1, path_name= None):
+    #sanitize text so that it can be used in SSML
+
+    text = re.sub(r'\s+', ' ', text)
+    print("\033[92m" + text + "\033[0m")
+    if language == "EN":
+        return synthesize_text_EN(text, speed, path_name)
+    elif language == "DE":
+        return synthesize_text_DE(text, speed, path_name)
+    elif language == "ES":
+        return synthesize_text_ES(text, speed, path_name)
+    elif language == "RU":
+        return synthesize_text_RU(text, speed, path_name)
+    elif language == "FR":
+        return synthesize_text_FR(text, speed, path_name)
+    elif language == "PT":
+        return synthesize_text_PT(text, speed, path_name)
+    else:
+        return openai_tts(text, path_name, speed)
+
+def openai_tts(text, output_file="output.mp3", speed=1):
     # Setze die notwendigen Header
     headers = {
         "Authorization": f"Bearer {api_key}",
@@ -31,7 +52,8 @@ def openai_tts(text, output_file="output.mp3"):
     data = {
         "model": "tts-1",
         "voice": "nova",
-        "input": text
+        "input": text,
+        "speed": speed
     }
 
     # Sende die Anfrage
