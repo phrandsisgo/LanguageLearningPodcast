@@ -307,5 +307,6 @@ def synthesize_text_PT(inputText, speed=1, path_name= None):
         out.write(response.audio_content)
         print("audio written to 'output_file'.")
     return output_file
+
 # languages available so far: EN, DE, ES, RU , FR, PT
-synthesize_text_PT("<speak>Quando tem feijoada na casa de Maria, ela convida alguns amigos para almoçar junto com ela.</speak>", 0.8, "hallo pt") # Test
+#synthesize_text_PT("<speak>Quando tem feijoada na casa de Maria, ela convida alguns amigos para almoçar junto com ela.</speak>", 0.8, "hallo pt") # Test

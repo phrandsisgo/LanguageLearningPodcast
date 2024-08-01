@@ -138,4 +138,4 @@ def get_base_language(jsonPath):
 
     return base_language
 # Usage test
-print(f"this is the path: {create_audio_folder('mark')}")
+#print(f"this is the path: {create_audio_folder('mark')}")
