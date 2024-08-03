@@ -1,5 +1,7 @@
 from audio_save import *
 from tts import tts_decisioner
+import os
+import re
 json_name = get_correct_json_data()
 
 short_file = json_name.rstrip(".json")
@@ -24,48 +26,44 @@ def do_story():
 def do_explanations():
     print("Starting to create explanation audio files")
     explanations_path = os.path.join("output", json_path)
-
+    # Check if there are files starting with "explanation" and have the extension ".mp3"
+    if os.path.exists(explanations_path) and any(fname.startswith("explanation") and fname.endswith(".mp3") for fname in os.listdir(explanations_path)):
+        print("Explanation files already exist.")
+        return
     explanations = get_explanations(json_name)
     if explanations is None:
         print("Error: Could not retrieve explanations.")
         return
 
-    # Find the highest existing sentence number
-    existing_files = [f for f in os.listdir(explanations_path) if f.startswith("sentence") and f.endswith(".mp3")]
-    highest_number = 0
-    for file in existing_files:
-        try:
-            number = int(file.replace("sentence", "").replace(".mp3", ""))
-            highest_number = max(highest_number, number)
-        except ValueError:
-            continue
+    target_language = get_target_language(json_name)
+    base_language = get_base_language(json_name)
 
-    # Start numbering from the next available number
-    start_number = highest_number + 1
-
-    for idx, explanation in enumerate(explanations[highest_number:], start_number):
-        sentence_number = explanation.get('sentence_number')
-        sentence = explanation.get('sentence')
+    for idx, explanation in enumerate(explanations, 1):
         explanation_text = explanation.get('explanation')
 
-        if sentence is None or explanation_text is None:
-            print(f"Error: Missing data for explanation {idx}")
+        if explanation_text is None:
+            print(f"Error: Missing explanation text for item {idx}")
             continue
 
-        # Create audio for the sentence in target language
-        sentence_path = os.path.join(explanations_path, f"sentence{idx}")
-        if not os.path.exists(sentence_path + ".mp3"):
-            tts_decisioner(get_target_language(json_name), sentence, speed=0.8, path_name=sentence_path)
-            print(f"Created audio for sentence {idx}")
+        # Split the explanation into parts based on language tags
+        parts = re.split(r'(---\w{2})', explanation_text)
+        parts = [part for part in parts if part.strip()]  # Remove empty parts
 
-        # Create audio for the explanation
-        explanation_path = os.path.join(explanations_path, f"explanation{idx}")
-        if not os.path.exists(explanation_path + ".mp3"):
-            tts_decisioner(get_base_language(json_name), explanation_text, path_name=explanation_path)
-            print(f"Created audio for explanation {idx}")
+        for sub_idx, part in enumerate(parts[1:], 1):  # Start from 1 to skip the first tag
+            if re.match(r'---\w{2}', part):
+                continue
+
+            language_tag = parts[sub_idx - 1]
+            language = base_language if language_tag == f'---{base_language.upper()}' else target_language
+
+            # Create audio for each part of the explanation
+            explanation_path = os.path.join(explanations_path, f"explanation{idx}-{sub_idx}")
+            if not os.path.exists(explanation_path + ".mp3"):
+                speed = 0.8 if language == target_language else 1.0
+                tts_decisioner(language, part.strip(), speed=speed, path_name=explanation_path)
+                print(f"Created audio for explanation {idx}-{sub_idx} in {language} with speed {speed}")
 
     print("All explanation audio files created.")
-
 do_intro()
 do_story()
 do_explanations()
