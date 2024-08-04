@@ -185,13 +185,13 @@ def get_inbetween_part(jsonPath):
         return None
 
     # Extract the inbetween_part from the JSON data
-    inbetween_part = data.get('inbetween_part')
+    inbetween_part = data.get('betweenpart')
     
     if inbetween_part is None:
         print("Error: The 'inbetween_part' field is missing from the JSON data.")
         return None
 
-    return inbetween_part
+    return inbetween_part 
 
 def get_explanations(jsonPath):
     jsonPath = os.path.join("output", jsonPath)
@@ -216,5 +216,4 @@ def get_explanations(jsonPath):
         return None
 
     return explanations
-# Usage test
-#print(f"this is the path: {create_audio_folder('mark')}")
+

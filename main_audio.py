@@ -23,6 +23,14 @@ def do_story():
     print("Story audio file created.")
     return
 
+def do_inbetween():
+    print("Starting to create inbetween audio files")
+    if os.path.exists(os.path.join("output",json_path, "inbetween")):
+        return
+    tts_decisioner(get_base_language(json_name), get_inbetween_part(json_name), speed=1.0, path_name=os.path.join("output",json_path, "inbetween"))
+    print("Inbetween audio file created.")
+    return
+
 def do_explanations():
     print("Starting to create explanation audio files")
     explanations_path = os.path.join("output", json_path)
@@ -65,5 +73,6 @@ def do_explanations():
 
     print("All explanation audio files created.")
 do_intro()
+do_inbetween()
 do_story()
 do_explanations()
