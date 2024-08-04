@@ -1,6 +1,8 @@
 from audio_save import *
 from tts import tts_decisioner
 import os
+from datetime import datetime
+from moviepy.editor import AudioFileClip, concatenate_audioclips
 import re
 json_name = get_correct_json_data()
 
@@ -72,7 +74,57 @@ def do_explanations():
                 print(f"Created audio for explanation {idx}-{sub_idx} in {language} with speed {speed}")
 
     print("All explanation audio files created.")
+    return
+
+def merge_mp3_files(files_folder):
+    # Dateinamen in der gewünschten Reihenfolge
+    file_order = ["intro.mp3", "story.mp3", "inbetween.mp3"]
+    
+    # Alle Erklärung-Dateien in der richtigen Reihenfolge sammeln
+    explanation_files = sorted(
+        (f for f in os.listdir(files_folder) if f.startswith("explanation") and f.endswith(".mp3")),
+        key=lambda x: tuple(map(int, re.findall(r'\d+', x)))
+    )
+
+    # Schauen, ob der Ordner existiert
+    if not os.path.exists(files_folder):
+        print(f"Error: The folder {files_folder} does not exist.")
+        return
+    
+    # Schauen, ob die Output-Datei mit dem namen done-Datum.mp3 schon existiert
+    if any(fname.startswith("done") and fname.endswith(".mp3") for fname in os.listdir(files_folder)):
+        print("Error: The combined audio file already exists.")
+        return
+
+    # Die Reihenfolge in der Datei-Liste kombinieren
+    all_files = file_order + explanation_files
+
+    # Liste der Audio-Clips erstellen
+    audio_clips = []
+
+    for file_name in all_files:
+        file_path = os.path.join(files_folder, file_name)
+        if os.path.exists(file_path):
+            audio_clips.append(AudioFileClip(file_path))
+        else:
+            print(f"Warning: {file_name} does not exist in the folder.")
+
+    # Audio-Clips kombinieren
+    if audio_clips:
+        combined = concatenate_audioclips(audio_clips)
+
+        # Zeitstempel für den Dateinamen
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        output_path = os.path.join(files_folder, f"done-{timestamp}.mp3")
+
+        # Zusammengeführte Audiodatei speichern
+        combined.write_audiofile(output_path)
+        print(f"Combined audio saved as {output_path}")
+    else:
+        print("No audio files to combine.")
+
 do_intro()
 do_inbetween()
 do_story()
 do_explanations()
+merge_mp3_files(os.path.join("output", json_path))
