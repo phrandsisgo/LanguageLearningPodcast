@@ -34,6 +34,10 @@ def tts_decisioner(language, text, speed=1, path_name= None):
         return synthesize_text_FR(ssml_text, speed, path_name)
     elif language == "PT":
         return synthesize_text_PT(ssml_text, speed, path_name)
+    elif language == "HU":
+        return syntehtize_text_HU(ssml_text, speed, path_name)
+    elif language == "NL":
+        return syntehtize_text_NL(ssml_text, speed, path_name)
     else:
         return openai_tts(text, path_name, speed)
 
@@ -308,5 +312,78 @@ def synthesize_text_PT(inputText, speed=1, path_name= None):
         print("audio written to 'output_file'.")
     return output_file
 
+def syntehtize_text_HU(inputText, speed=1, path_name= None):
+    synthesis_input = texttospeech.SynthesisInput(ssml=inputText)
+    voice = texttospeech.VoiceSelectionParams(
+        language_code="hu-HU",  # Hungarian
+        name="hu-HU-Wavenet-A",
+    )
+    audio_config = texttospeech.AudioConfig(
+        audio_encoding=texttospeech.AudioEncoding.MP3,
+        speaking_rate=speed,
+        pitch=-1.0
+    )
+    response = client.synthesize_speech(
+        input=synthesis_input,
+        voice=voice,
+        audio_config=audio_config
+    )
+    
+    # Get the current directory
+    current_dir = os.getcwd()
+
+    if path_name is None:
+        # If no path_name is given, we generate a new file name
+        audio_dir = os.path.join(current_dir, "Audio")
+        os.makedirs(audio_dir, exist_ok=True)
+        existing_files = len(os.listdir(audio_dir))
+        output_file = os.path.join(audio_dir, f"{existing_files + 1}Test.mp3")
+    else:
+        output_file = f"{path_name}.mp3"
+
+    # Ensure that the directory exists
+    os.makedirs(os.path.dirname(output_file), exist_ok=True)
+    # Save the answer (as MP3-File)
+    with open(output_file, "wb") as out:
+        out.write(response.audio_content)
+        print("audio written to 'output_file'.")
+    return output_file
+
+def syntehtize_text_NL(inputText, speed=1, path_name= None):
+    synthesis_input = texttospeech.SynthesisInput(ssml=inputText)
+    voice = texttospeech.VoiceSelectionParams(
+        language_code="nl-NL",  # Dutch
+        name="nl-NL-Wavenet-A",
+    )
+    audio_config = texttospeech.AudioConfig(
+        audio_encoding=texttospeech.AudioEncoding.MP3,
+        speaking_rate=speed,
+        pitch=-4.0
+    )
+    response = client.synthesize_speech(
+        input=synthesis_input,
+        voice=voice,
+        audio_config=audio_config
+    )
+    
+    # Get the current directory
+    current_dir = os.getcwd()
+
+    if path_name is None:
+        # If no path_name is given, we generate a new file name
+        audio_dir = os.path.join(current_dir, "Audio")
+        os.makedirs(audio_dir, exist_ok=True)
+        existing_files = len(os.listdir(audio_dir))
+        output_file = os.path.join(audio_dir, f"{existing_files + 1}Test.mp3")
+    else:
+        output_file = f"{path_name}.mp3"
+
+    # Ensure that the directory exists
+    os.makedirs(os.path.dirname(output_file), exist_ok=True)
+    # Save the answer (as MP3-File)
+    with open(output_file, "wb") as out:
+        out.write(response.audio_content)
+        print("audio written to 'output_file'.")
+    return output_file
 # languages available so far: EN, DE, ES, RU , FR, PT
 #synthesize_text_PT("<speak>Quando tem feijoada na casa de Maria, ela convida alguns amigos para almoçar junto com ela.</speak>", 0.8, "hallo pt") # Test
