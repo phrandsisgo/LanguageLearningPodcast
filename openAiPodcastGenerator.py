@@ -87,5 +87,28 @@ def lang_differentiator(sentence, baselanguage, targetlanguage):
 
         ],
     )
-    return response
+    first_result = response['choices'][0]['message']['content']
+    response2 = openai.ChatCompletion.create(
+        model="gpt-4-0613",  # Corrected model name
+        messages=[
+            {"role": "system", "content": f"""
+                Your job is to review and check the previous sentence to ensure it was differentiated correctly. Follow these steps:
+                1. Verify that all language switches are marked correctly with '---' followed by either {baselanguage} or {targetlanguage}.
+                2. Ensure that only actual words or phrases are marked for language switches, not punctuation or spaces.
+                3. Check that the original sentence structure and punctuation are maintained.
+                4. Confirm that no explanatory text was added.
+                5. Verify that single words for explanatory purposes in a different language are also differentiated.
+                6. Make sure only the language codes {baselanguage} and {targetlanguage} are used.
+                
+                If you find any errors, correct them and provide the corrected version. If everything is correct, return the original differentiated sentence.
+                Always maintain the '---XX' format for language switches.
+
+                If you find any errors, correct them. Your output should ONLY be the corrected differentiated sentence, nothing else.
+                If no corrections are needed, simply output the original differentiated sentence.
+                It is possible that certain words or parts of the sentence are not marked at all. If you find something like this and you think it should be marked, please mark it.
+            """},
+            {"role": "user", "content": f"Original sentence: {sentence}\nDifferentiated result: {first_result}\nLanguages used: {baselanguage} and {targetlanguage}"},
+        ],
+    )
+    return response2
 #print(emptyPromptFunction("""This is just a test. Answer with "yes I do understand" please"""))

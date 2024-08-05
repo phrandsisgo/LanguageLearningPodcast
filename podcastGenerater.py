@@ -137,17 +137,17 @@ def explainPrompter(sentence, baseIso, targetIso, wordlist, level, fullStory, st
             To give some rough guidlines on what the user wants the story to be focused and maby also what linguistic features the user wants to have explained here's the users Prompt: "{storyPrompt}" 
 
             Guidelines:
-            1. Start with a smooth transition (e.g., "Let's move on to the next sentence." or "Now, we encounter an interesting phrase.") Omit this rule 1 if it's the first sentence of the story.
-            2. Explain the sentence, focusing on its meaning and any challenging words or structures.
-            3. If the sentence contains words from this list: {wordlist}, provide extra explanation and examples.
-            4. Include cultural notes or usage tips if relevant.
-            5. Aim for a concise yet informative explanation (maximum 7 sentences please don't go over that threshhold).
-            6. End with a brief summary or a question to engage the listener.
-            7. Also try your best to not give any helps on how the words are supposed to sound like phonetically.
-            8. Super important is that you only use the languages {baseIso} and {targetIso} in the explanation and nothing else.
-            9. At least once the sentence should come fully translated in the language of {baseIso}.
-            10. Focus your attention not to every single word and try to not repeat yourself too much.focus more on what the user is asking for.
-
+            - Start with a smooth transition (e.g., "Let's move on to the next sentence." or "Now, we encounter an interesting phrase.") Omit this rule 1 if it's the first sentence of the story.
+            - Explain the sentence, focusing on its meaning and any challenging words or structures.
+            - If the sentence contains words from this list: {wordlist}, provide extra explanation and examples.
+            - Aim for a concise yet informative explanation (maximum 7 sentences please don't go over that threshhold).
+            - End with a brief summary or a question to engage the listener.
+            - Also try your best to not give any helps on how the words are supposed to sound like phonetically.
+            - Super important is that you only use the languages {baseIso} and {targetIso} in the explanation and nothing else.
+            - At least once the sentence should come fully translated in the language of {baseIso}.
+            - Focus your attention not to every single word and try to not repeat yourself too much. Focus more on what the user is asking for.
+            - Try to be compact and don't give too much information if it is not requested by the user
+            
             Remember, your explanation should flow naturally as part of a podcast, maintaining listener engagement between sentences.
             """
     return startPrompt
