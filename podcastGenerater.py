@@ -126,7 +126,7 @@ def updateTokens(currentTokens, newTokens):
     currentTokens += newTokens
     return currentTokens
 
-def explainPrompter(sentence, baseIso, targetIso, wordlist, level, fullStory):
+def explainPrompter(sentence, baseIso, targetIso, wordlist, level, fullStory, storyPrompt):#story Prompt has to be added
     startPrompt = f"""
             As an expert language teacher for a podcast, explain the following sentence from a {targetIso} story to a {level} level learner of {targetIso}. The explanation should be in {baseIso}.
 
@@ -134,8 +134,10 @@ def explainPrompter(sentence, baseIso, targetIso, wordlist, level, fullStory):
 
             Current sentence to explain: "{sentence}"
 
+            To give some rough guidlines on what the user wants the story to be focused and maby also what linguistic features the user wants to have explained here's the users Prompt: "{storyPrompt}" 
+
             Guidelines:
-            1. Start with a smooth transition (e.g., "Let's move on to the next part." or "Now, we encounter an interesting phrase.")
+            1. Start with a smooth transition (e.g., "Let's move on to the next sentence." or "Now, we encounter an interesting phrase.") Omit this rule 1 if it's the first sentence of the story.
             2. Explain the sentence, focusing on its meaning and any challenging words or structures.
             3. If the sentence contains words from this list: {wordlist}, provide extra explanation and examples.
             4. Include cultural notes or usage tips if relevant.
@@ -144,6 +146,7 @@ def explainPrompter(sentence, baseIso, targetIso, wordlist, level, fullStory):
             7. Also try your best to not give any helps on how the words are supposed to sound like phonetically.
             8. Super important is that you only use the languages {baseIso} and {targetIso} in the explanation and nothing else.
             9. At least once the sentence should come fully translated in the language of {baseIso}.
+            10. Focus your attention not to every single word and try to not repeat yourself too much.focus more on what the user is asking for.
 
             Remember, your explanation should flow naturally as part of a podcast, maintaining listener engagement between sentences.
             """
@@ -195,7 +198,7 @@ def explainSentence(fullstory, baseLanguage, targetLanguage, wordlist=None, leve
 
 
 
-
+#create the story
 finishedStory = emptyPromptFunction(storyPrompt)
 isoBase = get_ISO(baselanguage)
 isoTarget = get_ISO(target_language)
@@ -233,7 +236,7 @@ def process_openai_object(openai_object):
     return json.loads(json_str)
 
 for index, sentence in enumerate(storySentences, start=1):
-    explenationPrompt = explainPrompter(sentence, isoBase, isoTarget, wordlist, level, finishedStory)
+    explenationPrompt = explainPrompter(sentence, isoBase, isoTarget, wordlist, level, finishedStory, storyInput)
     sentenceExplenation = empty_GPT4o_mini(explenationPrompt)
     print("\n")
     differentiated = lang_differentiator(sentenceExplenation, isoBase, isoTarget)
